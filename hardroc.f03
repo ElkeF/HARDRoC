@@ -42,6 +42,9 @@ WRITE(*,*) 'Fin2coord allocated: ', ALLOCATED(fin2coord)
 CALL read_xyz_file(xyz_file,incoord,fin1coord,fin2coord,&
      &             number_of_in,number_of_fin1,number_of_fin2)
 
+WRITE(*,120) incoord
+120 FORMAT(' ',3F8.3)
+
 END PROGRAM hardroc
 
 
