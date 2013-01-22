@@ -109,13 +109,12 @@ use input_parameters
 
 ! Data dictionary
   CHARACTER(len=100), INTENT(IN) :: xyz_file
-  CHARACTER(len=100) :: buffer, label
+  CHARACTER(len=100) :: buffer
   CHARACTER(len=2)   :: at !atom type, requieres no space in front of atomtype in input file
   INTEGER :: pos
   INTEGER, PARAMETER :: fh = 16
   INTEGER :: ierror = 0
   INTEGER :: line = 0
-  INTEGER :: xyz !Count coordinates x=1, y=2, z=3
 
   ! Control file variables
   INTEGER,INTENT(OUT) :: number_of_in, number_of_fin1, number_of_fin2
@@ -133,7 +132,7 @@ use input_parameters
      IF (ierror == 0) THEN
         line = line + 1
 
-        ! Find the first instance of whitespace.  Split atomtype in label from coords
+        ! Find the first instance of whitespace.  Split atomtype in at from coords
         pos = scan(buffer, '    ')
         at = TRIM(buffer(1:pos))
 
