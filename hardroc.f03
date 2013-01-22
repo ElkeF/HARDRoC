@@ -106,12 +106,14 @@ use input_parameters
   INTEGER, PARAMETER :: fh = 16
   INTEGER :: ierror = 0
   INTEGER :: line = 0
+  INTEGER :: allocstatin=0, allocstatfin1=0, allocstatfin2=0
+  INTEGER :: xyz !Count coordinates x=1, y=2, z=3
 
   ! Control file variables
   INTEGER :: number_of_atoms=0, number_of_in=0, number_of_fin1=0, number_of_fin2=0
-  REAL, ALLOCATABLE, DIMENSION(:,:) :: inarray
-  REAL, ALLOCATABLE, DIMENSION(:,:) :: fin1array
-  REAL, ALLOCATABLE, DIMENSION(:,:) :: fin2array
+  REAL, ALLOCATABLE, DIMENSION(:,:) :: incoord
+  REAL, ALLOCATABLE, DIMENSION(:,:) :: fin1coord
+  REAL, ALLOCATABLE, DIMENSION(:,:) :: fin2coord
   INTEGER, DIMENSION(5) :: vector
 
 ! Find out how many initial and final state atoms are given in order
@@ -128,11 +130,9 @@ use input_parameters
         pos = scan(buffer, '    ')
         at = TRIM(buffer(1:pos))
 
-! Check Character variables
-!        WRITE(*,*) 'at: ', at
-!        WRITE(*,*) 'Length of at: ', LEN(at)
-!        WRITE(*,*) 'Atom type: ', in_atom_type
-!        WRITE(*,*) 'Length atom type: ', LEN(in_atom_type)
+! Find out, how many atoms we have of each type
+! These will give us the length of the coordinate arrays
+! in the following.
 
         IF (LGE(at,in_atom_type).AND.LLE(at,in_atom_type)) THEN
           number_of_in = number_of_in +1
@@ -150,20 +150,31 @@ use input_parameters
   END DO
 
   WRITE(*,*) '#initially  #final1     #final2'
-  WRITE(*,10) number_of_in, number_of_fin1, number_of_fin2
-  10 FORMAT (' ', 3I12)
+  WRITE(*,11) number_of_in, number_of_fin1, number_of_fin2
+  11 FORMAT (' ', 3I12)
 
-  REWIND(UNIT=fh)
+! Allocate the three arrays incoord, fin1coord, fin2coord
+  ALLOCATE(incoord(number_of_in,3), STAT=allocstatin)
+  ALLOCATE(fin1coord(number_of_fin1,3), STAT=allocstatfin1)
+  ALLOCATE(fin2coord(number_of_fin2,3), STAT=allocstatfin2)
+
+  WRITE(*,*) 'Incoord allocated: ', ALLOCATED(incoord)
+  WRITE(*,*) 'Fin1coord allocated: ', ALLOCATED(fin1coord)
+  WRITE(*,*) 'Fin2coord allocated: ', ALLOCATED(fin2coord)
+
+  REWIND(UNIT=fh,IOSTAT=ierror)
 
   ! ierror is negative if an end of record condition is encountered or if
   ! an endfile condition was detected.  It is positive if an error was
   ! detected.  ios is zero otherwise.
 
+! Reactivate number_of_in
+  number_of_in = 0
+  number_of_fin1 = 0
+  number_of_fin2 = 0
+
   DO WHILE (ierror == 0)
-!     READ(fh,*,IOSTAT=ierror) number_of_atoms
-!     IF (ierror == 0) THEN
-!     WRITE(*,*) number_of_atoms
-!     END IF
+
 
      READ(fh, '(A)', IOSTAT=ierror) buffer
      IF (ierror == 0) THEN
@@ -171,16 +182,27 @@ use input_parameters
 
         ! Find the first instance of whitespace.  Split label and data.
         pos = scan(buffer, '    ')
-        label = buffer(1:pos)
+        at = TRIM(buffer(1:pos))
         buffer = buffer(pos+1:)
 
-        SELECT CASE (label)
-        CASE ('vector')
-           READ(buffer, *, IOSTAT=ierror) vector
-           PRINT *, 'Read vector: ', vector
-        CASE default
-           PRINT *, 'Skipping invalid label at line', line
-        END SELECT
+        WRITE(*,*) 'at: ', at
+
+        IF (LGE(at,in_atom_type).AND.LLE(at,in_atom_type)) THEN
+          number_of_in = number_of_in +1
+          READ(buffer, *, IOSTAT=ierror) (incoord(number_of_in,xyz), xyz=1,3)
+          WRITE(*,*) 'Coordinates in incoord: ', (incoord(number_of_in,xyz), xyz=1,3)
+        END IF
+        IF (LGE(at,fin_atom_type1).AND.LLE(at,fin_atom_type1)) THEN
+          number_of_fin1 = number_of_fin1 +1
+          READ(buffer, *, IOSTAT=ierror) (fin1coord(number_of_fin1,xyz), xyz=1,3)
+          WRITE(*,*) 'Coordinates in fin1coord: ', (fin1coord(number_of_fin1,xyz), xyz=1,3)
+        END IF
+        IF (LGE(at,fin_atom_type2).AND.LLE(at,fin_atom_type2)) THEN
+          number_of_fin2 = number_of_fin2 +1
+          READ(buffer, *, IOSTAT=ierror) (fin2coord(number_of_fin2,xyz), xyz=1,3)
+          WRITE(*,*) 'Coordinates in fin2coord: ', (fin2coord(number_of_fin2,xyz), xyz=1,3)
+        END IF
+
      END IF
   END DO
 END SUBROUTINE read_xyz_file
