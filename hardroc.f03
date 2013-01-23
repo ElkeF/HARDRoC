@@ -12,11 +12,16 @@ IMPLICIT NONE
 !Data dictionary: Parameters for Inputfile reading
 CHARACTER(len=100) :: ctrl_file !Filename of the controlfile
 CHARACTER(len=100) :: xyz_file  !Filename of the xyz-file
+
 INTEGER :: number_of_in, number_of_fin1, number_of_fin2
 INTEGER :: allocstatin=0, allocstatfin1=0, allocstatfin2=0
-REAL, ALLOCATABLE, DIMENSION(:,:) :: incoord
-REAL, ALLOCATABLE, DIMENSION(:,:) :: fin1coord
-REAL, ALLOCATABLE, DIMENSION(:,:) :: fin2coord
+INTEGER :: no_pairs, no_dist
+
+REAL, ALLOCATABLE, DIMENSION(:,:) :: incoord !coordinates of initially ionized
+REAL, ALLOCATABLE, DIMENSION(:,:) :: fin1coord ! coordinates of fin1
+REAL, ALLOCATABLE, DIMENSION(:,:) :: fin2coord !coords of fin2
+REAL, ALLOCATABLE, DIMENSION(:)   :: distances !array of distances for ICD
+REAL, ALLOCATABLE, DIMENSION(:,:) :: dist_stat !number distance | distance
 
 ! The control file name is the first command-line argument
 
@@ -42,8 +47,23 @@ WRITE(*,*) 'Fin2coord allocated: ', ALLOCATED(fin2coord)
 CALL read_xyz_file(xyz_file,incoord,fin1coord,fin2coord,&
      &             number_of_in,number_of_fin1,number_of_fin2)
 
-WRITE(*,120) incoord
-120 FORMAT(' ',3F8.3)
+! Write this to ouput file in the end, skipping now
+!WRITE(*,120) incoord
+!120 FORMAT(' ',3F8.3)
+
+! At this point the coordinates and the input parameters have been
+! read into the programme and we can now start to calculate the distances
+! and internal coordinates of the pairs and triples
+pairs:IF (do_pairs) THEN
+  no_pairs = number_of_in*number_of_fin1
+  ALLOCATE(distances(no_pairs))
+
+  CALL calc_distances(incoord,fin1coord,distances,number_of_in,&
+                     &number_of_fin1,no_pairs,no_dist)
+ENDIF pairs
+
+triples:IF (do_triples) THEN
+END IF triples
 
 END PROGRAM hardroc
 
@@ -209,25 +229,122 @@ use input_parameters
         at = TRIM(buffer(1:pos))
         buffer = buffer(pos+1:)
 
-        WRITE(*,*) 'at: ', at
+!Check the correct atomtype, skip for now
+!        WRITE(*,*) 'at: ', at
 
 ! Write the coordinates into the arrays incoord, fin1coord, fin2coord
         IF (LGE(at,in_atom_type).AND.LLE(at,in_atom_type)) THEN
           number_of_in = number_of_in +1
           READ(buffer, *, IOSTAT=ierror) (incoord(number_of_in,xyz), xyz=1,3)
-          WRITE(*,*) 'Coordinates in incoord: ', (incoord(number_of_in,xyz), xyz=1,3)
+!          WRITE(*,*) 'Coordinates in incoord: ', (incoord(number_of_in,xyz), xyz=1,3)
         END IF
         IF (LGE(at,fin_atom_type1).AND.LLE(at,fin_atom_type1)) THEN
           number_of_fin1 = number_of_fin1 +1
           READ(buffer, *, IOSTAT=ierror) (fin1coord(number_of_fin1,xyz), xyz=1,3)
-          WRITE(*,*) 'Coordinates in fin1coord: ', (fin1coord(number_of_fin1,xyz), xyz=1,3)
+!          WRITE(*,*) 'Coordinates in fin1coord: ', (fin1coord(number_of_fin1,xyz), xyz=1,3)
         END IF
         IF (LGE(at,fin_atom_type2).AND.LLE(at,fin_atom_type2)) THEN
           number_of_fin2 = number_of_fin2 +1
           READ(buffer, *, IOSTAT=ierror) (fin2coord(number_of_fin2,xyz), xyz=1,3)
-          WRITE(*,*) 'Coordinates in fin2coord: ', (fin2coord(number_of_fin2,xyz), xyz=1,3)
+!          WRITE(*,*) 'Coordinates in fin2coord: ', (fin2coord(number_of_fin2,xyz), xyz=1,3)
         END IF
 
      END IF
   END DO
 END SUBROUTINE read_xyz_file
+
+
+
+
+SUBROUTINE calc_distances(incoord,fin1coord,distances,number_of_in,&
+                         &number_of_fin1,no_pairs,no_dist)
+IMPLICIT NONE
+
+! Data dictionary
+  INTEGER :: ierror = 0, row=1
+
+  ! Arrays of coordinates and distances
+  INTEGER :: i, j !counters
+  INTEGER :: number_of_in, number_of_fin1, no_pairs
+  INTEGER :: no_ind_entries
+  INTEGER, INTENT(OUT) :: no_dist
+  REAL, DIMENSION(number_of_in,3), INTENT(IN) :: incoord
+  REAL, DIMENSION(number_of_fin1,3), INTENT(IN) :: fin1coord
+  REAL, DIMENSION(no_pairs), INTENT(OUT) :: distances 
+  REAL, DIMENSION(1,3) :: xyz_in, xyz_fin ! help arrays to evaluate function dist
+  REAL :: dist
+
+  DO i=1,number_of_in
+    DO j=1,number_of_fin1
+    xyz_in = incoord(i:i,1:3)
+    xyz_fin = fin1coord(j:j,1:3)
+    distances(row) = dist(xyz_in,xyz_fin)
+!    WRITE (*,*) "Distance ", row, "is ", distances(row)
+    row = row+1
+    END DO
+  END DO
+
+  no_dist = no_ind_entries(distances,no_pairs)
+  WRITE(*,*) 'Number of independent distances: ', no_dist
+
+END SUBROUTINE calc_distances
+
+
+
+
+REAL FUNCTION dist (xyz_in, xyz_fin)
+! Purpose: Evaluate the distance between two atoms defined
+! by the 3D coordinates in incoord(i,1:3) and fin1coord(j,1:3)  
+
+  IMPLICIT NONE
+
+! Data dictionary
+  REAL, DIMENSION(1,3),INTENT(IN) :: xyz_in, xyz_fin
+  REAL :: diff, square, sum_squares
+  INTEGER :: i,j
+
+  sum_squares = 0.0
+
+  DO i=1,3
+    diff = xyz_in(1,i) - xyz_fin(1,i)
+    square = diff**2
+    sum_squares = sum_squares + square
+!    WRITE(*,*) 'Diff: ', diff
+  ENDDO
+
+  dist = SQRT(sum_squares)
+
+END FUNCTION dist
+
+INTEGER FUNCTION no_ind_entries(array,length)
+! Purpose: To determine the number of different entries in an array.
+
+  IMPLICIT NONE
+
+! Data dictionary
+  INTEGER, INTENT(IN) :: length
+  INTEGER :: i,j !counter
+  REAL :: thresh = 0.001
+  REAL :: temp
+  REAL, DIMENSION(length), INTENT(IN) :: array
+  REAL, DIMENSION(length) :: temparray
+
+  no_ind_entries = 0
+
+  temparray = array
+
+  DO i=1,length
+    IF (ABS(temparray(i))>thresh) THEN
+      temp = temparray(i)
+      temparray(i) = 0.0
+      no_ind_entries = no_ind_entries + 1
+      
+      DO j=i+1, length
+        IF (ABS(temparray(j)-temp) < thresh) THEN
+          temparray(j) = 0.0
+        END IF
+      END DO
+    END IF
+  END DO
+
+END FUNCTION no_ind_entries
