@@ -60,7 +60,19 @@ pairs:IF (do_pairs) THEN
 
   CALL calc_distances(incoord,fin1coord,distances,number_of_in,&
                      &number_of_fin1,no_pairs,no_dist)
-ENDIF pairs
+  
+
+! Create array dist_stat with the format with the number of equal
+! distances ne_dist and the corresponding distance.
+! The rank 2 array is totally real, because arrays are not allowed
+! to contain different types
+  ALLOCATE(dist_stat(no_dist,2))
+  CALL create_dist_stat(distances,dist_stat,no_pairs,no_dist)
+
+  WRITE(*,121) dist_stat
+  121 FORMAT (' ',F5.1,F8.3)
+
+END IF pairs
 
 triples:IF (do_triples) THEN
 END IF triples
@@ -292,6 +304,50 @@ END SUBROUTINE calc_distances
 
 
 
+SUBROUTINE create_dist_stat(distances,dist_stat,no_pairs,no_dist)
+! Purpose: To take the array distances and to write an new array
+!          dist_stat containing how often a distance is invoked
+!          and the distance itself
+
+  IMPLICIT NONE
+  
+! Data dictionary: exchanged with the main program
+  INTEGER, INTENT(IN) :: no_pairs, no_dist
+  REAL, DIMENSION(no_pairs) :: distances
+  REAL, DIMENSION(no_dist,2), INTENT(OUT) :: dist_stat
+
+! Data dictionary: temporary variables
+  INTEGER :: i,j,row=0 !counters
+  REAL :: temp, ne_dist
+  REAL :: thresh = 0.001
+
+  
+  DO i=1,no_pairs
+    IF (ABS(distances(i)) > thresh) THEN
+      row = row + 1
+      temp = distances(i)
+      distances(i) = 0.0
+      ne_dist = 1
+      
+      DO j=i+1, no_pairs
+        IF (ABS(distances(j)-temp) < thresh) THEN
+          distances(j) = 0.0
+          ne_dist = ne_dist + 1.0
+        END IF
+      END DO
+      
+      dist_stat(row,1) = ne_dist
+      dist_stat(row,2) = temp
+    END IF
+  END DO
+
+END SUBROUTINE create_dist_stat
+
+
+
+
+
+
 REAL FUNCTION dist (xyz_in, xyz_fin)
 ! Purpose: Evaluate the distance between two atoms defined
 ! by the 3D coordinates in incoord(i,1:3) and fin1coord(j,1:3)  
@@ -315,6 +371,10 @@ REAL FUNCTION dist (xyz_in, xyz_fin)
   dist = SQRT(sum_squares)
 
 END FUNCTION dist
+
+
+
+
 
 INTEGER FUNCTION no_ind_entries(array,length)
 ! Purpose: To determine the number of different entries in an array.
