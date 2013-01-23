@@ -72,6 +72,8 @@ pairs:IF (do_pairs) THEN
   WRITE(*,121) dist_stat
   121 FORMAT (' ',F5.1,F8.3)
 
+  DEALLOCATE(distances)
+
 END IF pairs
 
 triples:IF (do_triples) THEN
