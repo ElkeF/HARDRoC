@@ -7,6 +7,7 @@ PROGRAM hardroc
 ! to calculate the partial and total decay rates of the cluster.
 
 use input_parameters
+use wigner3j
 IMPLICIT NONE
 
 !Data dictionary: Parameters for Inputfile reading
@@ -16,6 +17,8 @@ CHARACTER(len=100) :: xyz_file  !Filename of the xyz-file
 INTEGER :: number_of_in, number_of_fin1, number_of_fin2
 INTEGER :: allocstatin=0, allocstatfin1=0, allocstatfin2=0
 INTEGER :: no_pairs, no_dist
+!Test
+REAL :: factest
 
 REAL, ALLOCATABLE, DIMENSION(:,:) :: incoord !coordinates of initially ionized
 REAL, ALLOCATABLE, DIMENSION(:,:) :: fin1coord ! coordinates of fin1
@@ -75,6 +78,12 @@ pairs:IF (do_pairs) THEN
   DEALLOCATE(distances)
 
 END IF pairs
+
+
+!Testing factorial
+  factest = eval_wigner3j(1.0,1.0,0.0,1.0,-1.0,0.0)
+  WRITE(*,*) 'factest: ', factest
+
 
 triples:IF (do_triples) THEN
 END IF triples
