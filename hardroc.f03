@@ -81,7 +81,7 @@ END IF pairs
 
 
 !Testing factorial
-  factest = eval_wigner3j(1.0,1.0,0.0,1.0,-1.0,0.0)
+  factest = eval_wigner3j(1.5,1.0,0.5,-1.5,1.0,0.5)
   WRITE(*,*) 'factest: ', factest
 
 
