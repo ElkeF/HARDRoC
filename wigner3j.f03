@@ -70,7 +70,7 @@ REAL FUNCTION eval_wigner3j(j1,j2,j3,m1,m2,m3)
 
    WRITE(*,*) 'kmax= ', kmax
 
-   prefactor = fact(zaehler1)*fact(zaehler2)*fact(zaehler3)*(2*j1+1)/fact(nenner1)
+   prefactor = SQRT(fact(zaehler1)*fact(zaehler2)*fact(zaehler3)*(2*j1+1)/fact(nenner1))
    adddiff   = fact(j1add)*fact(j1diff)*fact(j2add)*fact(j2diff)*fact(j3add)*fact(j3diff)
    root      = SQRT(adddiff)
    
