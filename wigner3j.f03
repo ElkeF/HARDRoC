@@ -1,10 +1,11 @@
 MODULE wigner3j
 ! Purpose: to calculate the Wigner 3j symbol for any given combination
 ! of j1, m1, j2, m2, j3, m3
-! ( j1  j2  j3)
-! (-m1  m2  m3)
-! find Edmonds74 for formula
-! be aware of the MINUS sign !!!
+! (j1  j2  j3)
+! (m1  m2  m3)
+! using one of the formulas from Edmonds74
+! be aware of the MINUS sign, which is introduced for m1 to m1m !!!
+! 
 use factorial
 
 CONTAINS
@@ -30,11 +31,11 @@ REAL FUNCTION eval_wigner3j(j1,j2,j3,m1,m2,m3)
 ! for the evaluation of the 3j symbol
  m1m = -m1
 
- WRITE(*,*) 'm1m= ', m1m
- WRITE(*,*) 'm2+m3= ', m2+m3
+! WRITE(*,*) 'm1m= ', m1m
+! WRITE(*,*) 'm2+m3= ', m2+m3
+
 ! Evaluate delta function
  delta:IF ( m1m == m2 + m3) THEN
-!   fac = fact(j1+j2)
 ! define variables
    zaehler1 = j2+j3-j1
    zaehler2 = j1+j2-j3
@@ -82,11 +83,11 @@ REAL FUNCTION eval_wigner3j(j1,j2,j3,m1,m2,m3)
    END DO
 
 
-   WRITE(*,*) 'prefactor= ', prefactor
-   WRITE(*,*) 'adddiff= ', adddiff
-   WRITE(*,*) 'root= ', root
-   WRITE(*,*) 'nenner= ', nenner
-   WRITE(*,*) 'sum_nenner= ', sum_nenner
+!   WRITE(*,*) 'prefactor= ', prefactor
+!   WRITE(*,*) 'adddiff= ', adddiff
+!   WRITE(*,*) 'root= ', root
+!   WRITE(*,*) 'nenner= ', nenner
+!   WRITE(*,*) 'sum_nenner= ', sum_nenner
    
    vc_coef = prefactor*root*sum_nenner
 
