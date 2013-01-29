@@ -1,4 +1,4 @@
-MODULE input_parameters
+MODULE control
 !Default values of the variables
 LOGICAL      :: do_pairs = .FALSE.
 LOGICAL      :: do_triples = .FALSE.
@@ -10,4 +10,4 @@ CHARACTER(2) :: in_atom_type = '', fin_atom_type1 = '', fin_atom_type2 = ''
 !REAL         :: tottau = 0.0   !Total photonemission lifetime
 !REAL         :: relatau = 0.0  !Relation between two taus
 !REAL         :: trdm = 0.0     !Transition dipole moment for the electron transfer
-END MODULE input_parameters
+END MODULE control

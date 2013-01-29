@@ -6,17 +6,21 @@ PROGRAM hardroc
 ! read experimental parameters for the chosen systems and
 ! to calculate the partial and total decay rates of the cluster.
 
-use input_parameters
+use control
+use lenfile
 use wigner3j
 IMPLICIT NONE
 
 !Data dictionary: Parameters for Inputfile reading
 CHARACTER(len=100) :: ctrl_file !Filename of the controlfile
 CHARACTER(len=100) :: xyz_file  !Filename of the xyz-file
+CHARACTER(len=100) :: channel_file  !Filename of the xyz-file
 
 INTEGER :: number_of_in, number_of_fin1, number_of_fin2
 INTEGER :: allocstatin=0, allocstatfin1=0, allocstatfin2=0
 INTEGER :: no_pairs, no_dist
+INTEGER :: no_channels ! How many lines the file channels has
+
 !Test
 REAL :: factest
 
@@ -25,11 +29,13 @@ REAL, ALLOCATABLE, DIMENSION(:,:) :: fin1coord ! coordinates of fin1
 REAL, ALLOCATABLE, DIMENSION(:,:) :: fin2coord !coords of fin2
 REAL, ALLOCATABLE, DIMENSION(:)   :: distances !array of distances for ICD
 REAL, ALLOCATABLE, DIMENSION(:,:) :: dist_stat !number distance | distance
+REAL, ALLOCATABLE, DIMENSION(:,:) :: channels  ! array specifying the parameters of the channels
 
 ! The control file name is the first command-line argument
 
 CALL get_command_argument(1, ctrl_file)
 CALL get_command_argument(2, xyz_file)
+CALL get_command_argument(3, channel_file)
 
 ! Call a subroutine to parse the control file
 CALL read_control_file(ctrl_file)
@@ -53,6 +59,10 @@ CALL read_xyz_file(xyz_file,incoord,fin1coord,fin2coord,&
 ! Write this to ouput file in the end, skipping now
 !WRITE(*,120) incoord
 !120 FORMAT(' ',3F8.3)
+
+no_channels = len_file(channel_file)
+WRITE(*,*) 'No channels= ', no_channels
+
 
 ! At this point the coordinates and the input parameters have been
 ! read into the programme and we can now start to calculate the distances
@@ -81,8 +91,8 @@ END IF pairs
 
 
 !Testing factorial
-  factest = eval_wigner3j(1.5,1.0,0.5,0.5,-1.0,0.5)
-  WRITE(*,*) 'factest: ', factest
+!  factest = eval_wigner3j(1.5,1.0,0.5,0.5,-1.0,0.5)
+!  WRITE(*,*) 'factest: ', factest
 
 
 triples:IF (do_triples) THEN
@@ -94,7 +104,7 @@ END PROGRAM hardroc
 
 
 SUBROUTINE read_control_file(ctrl_file)
-use input_parameters
+use control
 IMPLICIT NONE
 ! Input related variables
   CHARACTER(len=100) :: ctrl_file
@@ -151,7 +161,7 @@ END SUBROUTINE read_control_file
 
 
 SUBROUTINE len_atarray(xyz_file,number_of_in,number_of_fin1,number_of_fin2)
-use input_parameters
+use control
   IMPLICIT NONE
 
 ! Data dictionary
@@ -214,7 +224,7 @@ END SUBROUTINE len_atarray
 
 SUBROUTINE read_xyz_file(xyz_file,incoord,fin1coord,fin2coord,&
            &              number_of_in,number_of_fin1,number_of_fin2)
-use input_parameters
+use control
   IMPLICIT NONE
 
 ! Data dictionary
