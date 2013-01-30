@@ -14,7 +14,7 @@ IMPLICIT NONE
 !Data dictionary: Parameters for Inputfile reading
 CHARACTER(len=100) :: ctrl_file !Filename of the controlfile
 CHARACTER(len=100) :: xyz_file  !Filename of the xyz-file
-CHARACTER(len=100) :: channel_file  !Filename of the xyz-file
+CHARACTER(len=100) :: icd_channel_file  !Filename of the xyz-file
 
 INTEGER :: number_of_in, number_of_fin1, number_of_fin2
 INTEGER :: allocstatin=0, allocstatfin1=0, allocstatfin2=0
@@ -35,7 +35,7 @@ REAL, ALLOCATABLE, DIMENSION(:,:) :: channels  ! array specifying the parameters
 
 CALL get_command_argument(1, ctrl_file)
 CALL get_command_argument(2, xyz_file)
-CALL get_command_argument(3, channel_file)
+CALL get_command_argument(3, icd_channel_file)
 
 ! Call a subroutine to parse the control file
 CALL read_control_file(ctrl_file)
@@ -60,14 +60,20 @@ CALL read_xyz_file(xyz_file,incoord,fin1coord,fin2coord,&
 !WRITE(*,120) incoord
 !120 FORMAT(' ',3F8.3)
 
-no_channels = len_file(channel_file)
-WRITE(*,*) 'No channels= ', no_channels
-
 
 ! At this point the coordinates and the input parameters have been
 ! read into the programme and we can now start to calculate the distances
 ! and internal coordinates of the pairs and triples
 pairs:IF (do_pairs) THEN
+
+  no_channels = len_file(icd_channel_file)
+  WRITE(*,*) 'No channels= ', no_channels
+
+  ! Allocate the memory for the channels array
+  ALLOCATE(channels(no_channels,15))
+
+  CALL read_icd_channels(icd_channel_file,channels,no_channels)
+
   no_pairs = number_of_in*number_of_fin1
   ALLOCATE(distances(no_pairs))
 
@@ -286,6 +292,48 @@ use control
   END DO
 END SUBROUTINE read_xyz_file
 
+
+SUBROUTINE read_icd_channels(filename,channels,no_channels)
+! Purpose: to read in all the experimental aparmeters and J, M values
+! of the participating states
+  IMPLICIT NONE
+! Data dictionary
+  CHARACTER(len=100), INTENT(IN) :: filename
+  CHARACTER(len=200) :: buffer
+  CHARACTER(len=1) :: dummy
+  INTEGER :: pos
+  INTEGER, PARAMETER :: fh = 17
+  INTEGER :: ierror = 0
+  INTEGER :: line = 0
+  INTEGER :: input ! counter for input parameters
+  INTEGER, INTENT(IN) :: no_channels
+  REAL, DIMENSION(no_channels,15), INTENT(OUT) :: channels
+
+  OPEN(fh, FILE=filename, STATUS='OLD', ACTION='READ', IOSTAT=ierror)  
+  WRITE(*,*) 'file opening: ', ierror
+
+  DO WHILE (ierror == 0)
+    READ(fh, '(A)', IOSTAT=ierror) buffer
+
+    IF (ierror == 0) THEN
+! Find first white space
+! If the first character is #, then don't consider this line
+      pos = scan(buffer, '    ')
+      dummy = TRIM(buffer(1:pos))
+      buffer = buffer(pos+1:)
+
+      IF (LGE(dummy,'#').AND.LLE(dummy,'#')) THEN
+      ELSE
+        line = line + 1
+        WRITE(*,*) 'line: ', line
+        READ(buffer, *, IOSTAT=ierror) (channels(line,input), input=1,15)
+        WRITE(*,*) 'Channel ', (channels(line,input), input=1,15)
+      END IF
+    END IF
+  END DO
+
+
+END SUBROUTINE read_icd_channels
 
 
 
