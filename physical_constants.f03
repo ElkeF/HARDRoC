@@ -14,8 +14,8 @@ REAL,PARAMETER :: pi = 3.141592654 !pi halt
 REAL,PARAMETER :: a_0 = h/(2*pi*m_e*c*fs_const) !Bohr radius
 
 ! Conversion factors
-!REAL,PARAMETER :: angstrom_to_bohr
-!REAL,PARAMETER :: bohr_to_angstrom
+REAL,PARAMETER :: angstrom_to_bohr = a_0*1E10
+REAL,PARAMETER :: bohr_to_angstrom = 1/a_0 * 1E-10
 ! Energies
 REAL,PARAMETER :: joule_to_ev = 1/e
 REAL,PARAMETER :: ev_to_joule = e
@@ -38,6 +38,8 @@ SUBROUTINE write_phys_const()
   
   WRITE(*,*) ' '
   WRITE(*,*) 'Conversion factors used in this programme'
+  WRITE(*,131) 'Angstrom to Bohr', angstrom_to_bohr
+  WRITE(*,131) 'Bohr to Angstrom', bohr_to_angstrom
   WRITE(*,131) 'Joule to eV', joule_to_ev
   WRITE(*,131) 'eV to Joule', ev_to_joule
   WRITE(*,131) 'Joule to Hartree', joule_to_hartree
