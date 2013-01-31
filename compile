@@ -1,3 +1,3 @@
 #!/bin/bash
 
-gfortran -o hardroc.x channel_char.f03 control.f03 lenfile.f03 factorial.f03 wigner3j.f03 hardroc.f03
+gfortran -o hardroc.x physical_constants.f03 channel_char.f03 control.f03 lenfile.f03 factorial.f03 wigner3j.f03 hardroc.f03
