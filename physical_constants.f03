@@ -10,12 +10,19 @@ REAL,PARAMETER :: h = 6.62606957E-34 !Plancks constant in SI
 REAL,PARAMETER :: m_e = 9.10938215E-31 !Rest mass of electron
 REAL,PARAMETER :: e = 1.602176565E-19 !Charge of the electron in SI
 REAL,PARAMETER :: fs_const = 1/137.035999074 !alpa alias fine-structure constant
+REAL,PARAMETER :: c_au = 1/fs_const
 REAL,PARAMETER :: pi = 3.141592654 !pi halt
 REAL,PARAMETER :: a_0 = h/(2*pi*m_e*c*fs_const) !Bohr radius
+REAL,PARAMETER :: E_h = fs_const**2 * m_e * c**2
 
 ! Conversion factors
+! Distances, Areas, Volume
 REAL,PARAMETER :: bohr_to_angstrom = a_0*1E10
 REAL,PARAMETER :: angstrom_to_bohr = 1/a_0 * 1E-10
+REAL,PARAMETER :: bohr_to_meter = a_0
+REAL,PARAMETER :: meter_to_bohr = 1/a_0
+REAL,PARAMETER :: megabarn_to_sqmeter = 1E-22
+REAL,PARAMETER :: sqmeter_to_megabarn = 1E22
 ! Energies
 REAL,PARAMETER :: joule_to_ev = 1/e
 REAL,PARAMETER :: ev_to_joule = e
@@ -23,6 +30,9 @@ REAL,PARAMETER :: hartree_to_joule = h*c*fs_const/(a_0*2*pi)
 REAL,PARAMETER :: joule_to_hartree = (a_0*2*pi)/(h*c*fs_const)
 REAL,PARAMETER :: hartree_to_ev = hartree_to_joule*joule_to_ev
 REAL,PARAMETER :: ev_to_hartree = ev_to_joule*joule_to_hartree
+! Time
+REAL,PARAMETER :: second_to_atu = E_h*2*pi/h
+REAL,PARAMETER :: atu_to_second = h/(2*pi*E_h)
 
 CONTAINS
 SUBROUTINE write_phys_const()
@@ -35,11 +45,15 @@ SUBROUTINE write_phys_const()
   WRITE(*,131) 'Fine structure constant', fs_const
   WRITE(*,131) 'pi', pi
   WRITE(*,131) 'Bohr radius', a_0
+  WRITE(*,131) 'Hartree energy', E_h
   
   WRITE(*,*) ' '
   WRITE(*,*) 'Conversion factors used in this programme'
   WRITE(*,131) 'Angstrom to Bohr', angstrom_to_bohr
   WRITE(*,131) 'Bohr to Angstrom', bohr_to_angstrom
+  WRITE(*,131) 'Megabarn to square meter', megabarn_to_sqmeter
+  WRITE(*,131) 'Second to a.t.u', second_to_atu
+  WRITE(*,131) 'a.t.u. to Second', atu_to_second
   WRITE(*,131) 'Joule to eV', joule_to_ev
   WRITE(*,131) 'eV to Joule', ev_to_joule
   WRITE(*,131) 'Joule to Hartree', joule_to_hartree
