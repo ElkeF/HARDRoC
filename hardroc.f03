@@ -9,6 +9,7 @@ PROGRAM hardroc
 use control
 use lenfile
 use wigner3j
+use physical_constants
 IMPLICIT NONE
 
 !Data dictionary: Parameters for Inputfile reading
@@ -60,6 +61,8 @@ CALL read_xyz_file(xyz_file,incoord,fin1coord,fin2coord,&
 !WRITE(*,120) incoord
 !120 FORMAT(' ',3F8.3)
 
+!Display the physical constants used
+CALL write_phys_const()
 
 ! At this point the coordinates and the input parameters have been
 ! read into the programme and we can now start to calculate the distances
@@ -74,12 +77,12 @@ pairs:IF (do_pairs) THEN
 
   CALL read_icd_channels(icd_channel_file,channels,no_channels)
 
-  no_pairs = number_of_in*number_of_fin1
+  no_pairs = number_of_in*number_of_fin2
   ALLOCATE(distances(no_pairs))
 
-  CALL calc_distances(incoord,fin1coord,distances,number_of_in,&
-                     &number_of_fin1,no_pairs,no_dist)
-  
+  CALL calc_distances(incoord,fin2coord,distances,number_of_in,&
+                     &number_of_fin2,no_pairs,no_dist)
+
 
 ! Create array dist_stat with the format with the number of equal
 ! distances ne_dist and the corresponding distance.
@@ -93,12 +96,12 @@ pairs:IF (do_pairs) THEN
 
   DEALLOCATE(distances)
 
+  CALL calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
+  DEALLOCATE(channels)
+
 END IF pairs
 
 
-!Testing factorial
-!  factest = eval_wigner3j(1.5,1.0,0.5,0.5,-1.0,0.5)
-!  WRITE(*,*) 'factest: ', factest
 
 
 triples:IF (do_triples) THEN
@@ -327,18 +330,98 @@ SUBROUTINE read_icd_channels(filename,channels,no_channels)
         line = line + 1
         WRITE(*,*) 'line: ', line
         READ(buffer, *, IOSTAT=ierror) (channels(line,input), input=1,15)
-        WRITE(*,*) 'Channel ', (channels(line,input), input=1,15)
+!        WRITE(*,*) 'Channel ', (channels(line,input), input=1,15)
       END IF
     END IF
   END DO
 
+  CLOSE(fh)
 
 END SUBROUTINE read_icd_channels
 
 
+SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
+!Purpose: to calculate the partial and total ICD Gammas
 
-SUBROUTINE calc_distances(incoord,fin1coord,distances,number_of_in,&
-                         &number_of_fin1,no_pairs,no_dist)
+!Modules
+  use channel_char
+  use physical_constants
+
+  IMPLICIT NONE
+
+!Data dictionary: arrays
+  INTEGER, INTENT(IN) :: no_channels,no_dist
+  REAL, DIMENSION(no_channels,15), INTENT(IN) :: channels
+  REAL, DIMENSION(no_dist,2) :: dist_stat
+
+! Data dictionary: distances and number of equivalent pairs
+  INTEGER :: neq_pairs !number of equivalent pairs, to be read in from dist_stat(:,1)
+  REAL :: R_angstrom !to be read in from dist_stat(:,2)
+  REAL :: R_bohr !R_angstrom converted to bohr for calculation
+  
+!Data dictionary
+  INTEGER :: ichannel !counter of the channels
+  INTEGER :: idist ! counter of the collected pairs
+  REAL :: E_in, E_fin1, E_fin2 !shifted energies
+  REAL :: E_Coulomb !Coulomb energy
+  REAL :: E_sec !Secondary electron produced in the ICD/ETMD process
+
+
+  each_channel:DO ichannel=1,no_channels
+
+! Assign channel parameters to values in module channel_char
+  J_A         = channels(ichannel,1) / 2.0
+  M_A         = channels(ichannel,2) / 2.0
+  SIP_in      = channels(ichannel,3)
+  shift_in    = channels(ichannel,4)
+
+  J_Ap        = channels(ichannel,5) / 2.0
+  M_Ap        = channels(ichannel,6) / 2.0
+  SIP_fin1    = channels(ichannel,7)
+  shift_fin1  = channels(ichannel,8)
+  tottau      = channels(ichannel,9)
+  taurel      = channels(ichannel,10)
+
+  j_Bp        = channels(ichannel,11) / 2.0
+  SIP_fin2    = channels(ichannel,12)
+  shift_fin2  = channels(ichannel,13)
+  sigmaabs    = channels(ichannel,14)
+  sigmarel    = channels(ichannel,15)
+
+! Test whether this channel makes sense at all
+  E_in    = SIP_in + shift_in
+  E_fin1  = SIP_fin1 + shift_fin1
+  E_fin2  = SIP_fin2 + shift_fin2
+
+  channel_sense:IF (E_in - E_fin1 - E_fin2 > 0) THEN
+
+    WRITE(*,*) 'Processing channel ', ichannel
+
+    DO idist=1,no_dist
+
+! Find values for given pair
+      neq_pairs  = INT(dist_stat(idist,1))
+      R_angstrom = dist_stat(idist,2)
+      R_bohr     = R_angstrom * angstrom_to_bohr
+
+      E_Coulomb  = 1/R_bohr * hartree_to_ev
+      E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
+
+! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist
+      IF (E_sec >= 0.0) THEN
+        WRITE(*,*) 'E_sec= ', E_sec
+      END IF
+    END DO
+  END IF channel_sense
+
+  END DO each_channel
+
+END SUBROUTINE calc_icd_gamma
+
+
+
+SUBROUTINE calc_distances(incoord,fin2coord,distances,number_of_in,&
+                         &number_of_fin2,no_pairs,no_dist)
 IMPLICIT NONE
 
 ! Data dictionary
@@ -346,19 +429,19 @@ IMPLICIT NONE
 
   ! Arrays of coordinates and distances
   INTEGER :: i, j !counters
-  INTEGER :: number_of_in, number_of_fin1, no_pairs
+  INTEGER :: number_of_in, number_of_fin2, no_pairs
   INTEGER :: no_ind_entries
   INTEGER, INTENT(OUT) :: no_dist
   REAL, DIMENSION(number_of_in,3), INTENT(IN) :: incoord
-  REAL, DIMENSION(number_of_fin1,3), INTENT(IN) :: fin1coord
+  REAL, DIMENSION(number_of_fin2,3), INTENT(IN) :: fin2coord
   REAL, DIMENSION(no_pairs), INTENT(OUT) :: distances 
   REAL, DIMENSION(1,3) :: xyz_in, xyz_fin ! help arrays to evaluate function dist
   REAL :: dist
 
   DO i=1,number_of_in
-    DO j=1,number_of_fin1
+    DO j=1,number_of_fin2
     xyz_in = incoord(i:i,1:3)
-    xyz_fin = fin1coord(j:j,1:3)
+    xyz_fin = fin2coord(j:j,1:3)
     distances(row) = dist(xyz_in,xyz_fin)
 !    WRITE (*,*) "Distance ", row, "is ", distances(row)
     row = row+1
@@ -419,7 +502,7 @@ END SUBROUTINE create_dist_stat
 
 REAL FUNCTION dist (xyz_in, xyz_fin)
 ! Purpose: Evaluate the distance between two atoms defined
-! by the 3D coordinates in incoord(i,1:3) and fin1coord(j,1:3)  
+! by the 3D coordinates in incoord(i,1:3) and fin2coord(j,1:3)  
 
   IMPLICIT NONE
 
