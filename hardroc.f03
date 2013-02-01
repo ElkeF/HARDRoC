@@ -62,7 +62,7 @@ CALL read_xyz_file(xyz_file,incoord,fin1coord,fin2coord,&
 !120 FORMAT(' ',3F8.3)
 
 !Display the physical constants used
-CALL write_phys_const()
+!CALL write_phys_const()
 
 ! At this point the coordinates and the input parameters have been
 ! read into the programme and we can now start to calculate the distances
@@ -346,6 +346,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
 !Modules
   use channel_char
   use physical_constants
+  use wigner3j
 
   IMPLICIT NONE
 
@@ -359,62 +360,103 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
   REAL :: R_angstrom !to be read in from dist_stat(:,2)
   REAL :: R_bohr !R_angstrom converted to bohr for calculation
   
+! Data dictionary: actual variables in calculation in correct units
+  REAL :: wigner !will hold the alue of the wigner3j symbol
+  INTEGER :: B_MAMAp !value of B depending on M_Ap-M_A
+  REAL :: tau !Radiative lifetime of the channel
+  REAL :: tau_au !in atomic units
+  REAL :: omega_vp !energy of the virtual photon transferred
+  REAL :: sigma ! ionization cross section
+  REAL :: sigma_au !in atomic units
+
 !Data dictionary
   INTEGER :: ichannel !counter of the channels
   INTEGER :: idist ! counter of the collected pairs
   REAL :: E_in, E_fin1, E_fin2 !shifted energies
   REAL :: E_Coulomb !Coulomb energy
   REAL :: E_sec !Secondary electron produced in the ICD/ETMD process
-
+  REAL :: gamma_b !Decay rate of channel beta
+  REAL :: gamma_b_pairs !Decay rate considering all equivalent pairs
+  REAL :: gamma_b_all_pairs !Sum of all gamma_b_pairs
 
   each_channel:DO ichannel=1,no_channels
+  
+  ! Assign channel parameters to values in module channel_char
+    J_A         = channels(ichannel,1) / 2.0
+    M_A         = channels(ichannel,2) / 2.0
+    SIP_in      = channels(ichannel,3)
+    shift_in    = channels(ichannel,4)
 
-! Assign channel parameters to values in module channel_char
-  J_A         = channels(ichannel,1) / 2.0
-  M_A         = channels(ichannel,2) / 2.0
-  SIP_in      = channels(ichannel,3)
-  shift_in    = channels(ichannel,4)
+    J_Ap        = channels(ichannel,5) / 2.0
+    M_Ap        = channels(ichannel,6) / 2.0
+    SIP_fin1    = channels(ichannel,7)
+    shift_fin1  = channels(ichannel,8)
+    tottau      = channels(ichannel,9)
+    taurel      = channels(ichannel,10)
 
-  J_Ap        = channels(ichannel,5) / 2.0
-  M_Ap        = channels(ichannel,6) / 2.0
-  SIP_fin1    = channels(ichannel,7)
-  shift_fin1  = channels(ichannel,8)
-  tottau      = channels(ichannel,9)
-  taurel      = channels(ichannel,10)
+    j_Bp        = channels(ichannel,11) / 2.0
+    SIP_fin2    = channels(ichannel,12)
+    shift_fin2  = channels(ichannel,13)
+    sigmaabs    = channels(ichannel,14)
+    sigmarel    = channels(ichannel,15)
 
-  j_Bp        = channels(ichannel,11) / 2.0
-  SIP_fin2    = channels(ichannel,12)
-  shift_fin2  = channels(ichannel,13)
-  sigmaabs    = channels(ichannel,14)
-  sigmarel    = channels(ichannel,15)
+! Convert the numbers into the numbers needed and in the correct units
+    SELECT CASE (INT(M_Ap - M_A))
+      CASE (-1,1)
+        B_MAMAp = 1
+      CASE (0)
+        B_MAMAp = -2
+      CASE DEFAULT
+        B_MAMAp = 0
+    END SELECT
+    WRITE(*,*) 'B_MAMAp= ', B_MAMAp
+
+    wigner   = eval_wigner3j(J_Ap,1.0,J_A,-M_Ap,M_Ap-M_A,M_A)
+!    WRITE(*,*) 'Wigner3j symbol: ', wigner
+    tau      = tottau/(1 + 1/taurel)
+    tau_au   = tau * second_to_atu
+!    WRITE(*,*) 'tau_au= ', tau_au
+    sigma    = sigmaabs / (1 + 1/sigmarel)
+    sigma_au = sigma * megabarn_to_sqmeter * meter_to_bohr**2
+!    WRITE(*,*) 'sigma_au = ', sigma_au
+
+! Energies used for comparison and calculation
+    E_in     = SIP_in + shift_in
+    E_fin1   = SIP_fin1 + shift_fin1
+    E_fin2   = SIP_fin2 + shift_fin2
+    omega_vp = (E_in - E_fin1) * ev_to_hartree
+
 
 ! Test whether this channel makes sense at all
-  E_in    = SIP_in + shift_in
-  E_fin1  = SIP_fin1 + shift_fin1
-  E_fin2  = SIP_fin2 + shift_fin2
+    channel_sense:IF (E_in - E_fin1 - E_fin2 > 0) THEN
+  
+      WRITE(*,*) 'Processing channel ', ichannel
 
-  channel_sense:IF (E_in - E_fin1 - E_fin2 > 0) THEN
-
-    WRITE(*,*) 'Processing channel ', ichannel
-
-    DO idist=1,no_dist
+      DO idist=1,no_dist
 
 ! Find values for given pair
-      neq_pairs  = INT(dist_stat(idist,1))
-      R_angstrom = dist_stat(idist,2)
-      R_bohr     = R_angstrom * angstrom_to_bohr
-
-      E_Coulomb  = 1/R_bohr * hartree_to_ev
-      E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
+        neq_pairs  = INT(dist_stat(idist,1))
+        R_angstrom = dist_stat(idist,2)
+        R_bohr     = R_angstrom * angstrom_to_bohr
+  
+        E_Coulomb  = 1/R_bohr * hartree_to_ev
+        E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
 
 ! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist
-      IF (E_sec >= 0.0) THEN
-        WRITE(*,*) 'E_sec= ', E_sec
-      END IF
-    END DO
-  END IF channel_sense
+        IF (E_sec >= 0.0) THEN
+          WRITE(*,*) 'E_sec= ', E_sec
+          gamma_b = 2*pi/R_bohr**6 * B_MAMAp**2 * wigner**2 *(2*J_A+1)&
+                  & *3*c_au**4 *sigma_au/(16*pi**2 * omega_vp**4 * tau_au)
+          WRITE(*,*) 'Gamma beta = ', gamma_b
+          gamma_b_pairs = neq_pairs * gamma_b
+          gamma_b_all_pairs = gamma_b_all_pairs + gamma_b_pairs
+        END IF
+      END DO
+    END IF channel_sense
 
   END DO each_channel
+
+  WRITE(*,*) 'Sum of all Gammas for this channel and geometry ', gamma_b_all_pairs
 
 END SUBROUTINE calc_icd_gamma
 
