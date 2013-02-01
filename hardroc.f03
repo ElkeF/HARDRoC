@@ -377,7 +377,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
   REAL :: E_sec !Secondary electron produced in the ICD/ETMD process
   REAL :: gamma_b !Decay rate of channel beta
   REAL :: gamma_b_pairs !Decay rate considering all equivalent pairs
-  REAL :: gamma_b_all_pairs !Sum of all gamma_b_pairs
+  REAL :: gamma_b_all_pairs=0.0 !Sum of all gamma_b_pairs
 
   each_channel:DO ichannel=1,no_channels
   
@@ -446,7 +446,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
         IF (E_sec >= 0.0) THEN
           WRITE(*,*) 'E_sec= ', E_sec
           gamma_b = 2*pi/R_bohr**6 * B_MAMAp**2 * wigner**2 *(2*J_A+1)&
-                  & *3*c_au**4 *sigma_au/(16*pi**2 * omega_vp**4 * tau_au)
+                  & *3*c_au**4 *sigma_au/(16*pi**2 * omega_vp**4 * tau_au) * hartree_to_ev
           WRITE(*,*) 'Gamma beta = ', gamma_b
           gamma_b_pairs = neq_pairs * gamma_b
           gamma_b_all_pairs = gamma_b_all_pairs + gamma_b_pairs
