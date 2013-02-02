@@ -17,14 +17,22 @@ CHARACTER(len=100) :: ctrl_file !Filename of the controlfile
 CHARACTER(len=100) :: xyz_file  !Filename of the xyz-file
 CHARACTER(len=100) :: icd_channel_file  !Filename of the xyz-file
 
+!Data dictionary: wirting output
+CHARACTER(len=106)  :: nmout != 'output'
+
+
 INTEGER :: number_of_in, number_of_fin1, number_of_fin2
 INTEGER :: allocstatin=0, allocstatfin1=0, allocstatfin2=0
+INTEGER :: ierror = 0 ! used for outputfile
 INTEGER :: no_pairs, no_dist
 INTEGER :: no_channels ! How many lines the file channels has
+
 
 !Test
 REAL :: factest
 
+! Allocatable array which will be allocated during the
+! calculation
 REAL, ALLOCATABLE, DIMENSION(:,:) :: incoord !coordinates of initially ionized
 REAL, ALLOCATABLE, DIMENSION(:,:) :: fin1coord ! coordinates of fin1
 REAL, ALLOCATABLE, DIMENSION(:,:) :: fin2coord !coords of fin2
@@ -32,11 +40,16 @@ REAL, ALLOCATABLE, DIMENSION(:)   :: distances !array of distances for ICD
 REAL, ALLOCATABLE, DIMENSION(:,:) :: dist_stat !number distance | distance
 REAL, ALLOCATABLE, DIMENSION(:,:) :: channels  ! array specifying the parameters of the channels
 
-! The control file name is the first command-line argument
 
+! The control file name is the first command-line argument
 CALL get_command_argument(1, ctrl_file)
 CALL get_command_argument(2, xyz_file)
 CALL get_command_argument(3, icd_channel_file)
+
+!Set name of the outputfile
+WRITE(nmout,*) TRIM(xyz_file)//'.out'
+
+OPEN(of, FILE=TRIM(ADJUSTL(nmout)), STATUS='UNKNOWN', ACTION='WRITE', IOSTAT=ierror)
 
 ! Call a subroutine to parse the control file
 CALL read_control_file(ctrl_file)
@@ -49,17 +62,17 @@ ALLOCATE(incoord(number_of_in,3), STAT=allocstatin)
 ALLOCATE(fin1coord(number_of_fin1,3), STAT=allocstatfin1)
 ALLOCATE(fin2coord(number_of_fin2,3), STAT=allocstatfin2)
 
-WRITE(*,*) 'Incoord allocated: ', ALLOCATED(incoord)
-WRITE(*,*) 'Fin1coord allocated: ', ALLOCATED(fin1coord)
-WRITE(*,*) 'Fin2coord allocated: ', ALLOCATED(fin2coord)
+WRITE(of,*) 'Incoord allocated: ', ALLOCATED(incoord)
+WRITE(of,*) 'Fin1coord allocated: ', ALLOCATED(fin1coord)
+WRITE(of,*) 'Fin2coord allocated: ', ALLOCATED(fin2coord)
 
 ! Call a subroutine to read in the xyz_file
 CALL read_xyz_file(xyz_file,incoord,fin1coord,fin2coord,&
      &             number_of_in,number_of_fin1,number_of_fin2)
 
 ! Write this to ouput file in the end, skipping now
-!WRITE(*,120) incoord
-!120 FORMAT(' ',3F8.3)
+WRITE(of,120) incoord
+120 FORMAT(' ',3F8.3)
 
 !Display the physical constants used
 !CALL write_phys_const()
@@ -70,7 +83,7 @@ CALL read_xyz_file(xyz_file,incoord,fin1coord,fin2coord,&
 pairs:IF (do_pairs) THEN
 
   no_channels = len_file(icd_channel_file)
-  WRITE(*,*) 'No channels= ', no_channels
+  WRITE(of,*) 'No channels= ', no_channels
 
   ! Allocate the memory for the channels array
   ALLOCATE(channels(no_channels,15))
@@ -91,7 +104,7 @@ pairs:IF (do_pairs) THEN
   ALLOCATE(dist_stat(no_dist,2))
   CALL create_dist_stat(distances,dist_stat,no_pairs,no_dist)
 
-  WRITE(*,121) dist_stat
+  WRITE(of,121) dist_stat
   121 FORMAT (' ',F5.1,F8.3)
 
   DEALLOCATE(distances)
@@ -145,24 +158,21 @@ IMPLICIT NONE
         SELECT CASE (label)
         CASE ('pairs')
            READ(buffer, *, IOSTAT=ierror) do_pairs
-           PRINT *, 'Read do_pairs: ', do_pairs
+           WRITE(of,*) 'Read do_pairs: ', do_pairs
         CASE ('triples')
            READ(buffer, *, IOSTAT=ierror) do_triples
-           PRINT *, 'Read do_triples: ', do_triples
+           WRITE(of,*) 'Read do_triples: ', do_triples
         CASE ('atin')
            READ(buffer, *, IOSTAT=ierror) in_atom_type
-           PRINT *, 'Read in_atom_type: ', in_atom_type
+           WRITE(of,*) 'Read in_atom_type: ', in_atom_type
         CASE ('atfin1')
            READ(buffer, *, IOSTAT=ierror) fin_atom_type1
-           PRINT *, 'Read fin_atom_type1: ', fin_atom_type1
+           WRITE(of,*) 'Read fin_atom_type1: ', fin_atom_type1
         CASE ('atfin2')
            READ(buffer, *, IOSTAT=ierror) fin_atom_type2
-           PRINT *, 'Read fin_atom_type2: ', fin_atom_type2
-        CASE ('vector')
-           READ(buffer, *, IOSTAT=ierror) vector
-           PRINT *, 'Read vector: ', vector
+           WRITE(of,*) 'Read fin_atom_type2: ', fin_atom_type2
         CASE default
-           PRINT *, 'Skipping invalid label at line', line
+           WRITE(of,*) 'Skipping invalid label at line', line
         END SELECT
      END IF
   END DO
@@ -208,23 +218,23 @@ use control
 
         IF (LGE(at,in_atom_type).AND.LLE(at,in_atom_type)) THEN
           number_of_in = number_of_in +1
-!          WRITE(*,*) 'Number of initially ionized atoms: ', number_of_in
+!          WRITE(of,*) 'Number of initially ionized atoms: ', number_of_in
         END IF
         IF (LGE(at,fin_atom_type1).AND.LLE(at,fin_atom_type1)) THEN
           number_of_fin1 = number_of_fin1 +1
-!          WRITE(*,*) 'Number of atoms ionized in the final state1', number_of_fin1
+!          WRITE(of,*) 'Number of atoms ionized in the final state1', number_of_fin1
         END IF
         IF (LGE(at,fin_atom_type2).AND.LLE(at,fin_atom_type2)) THEN
           number_of_fin2 = number_of_fin2 +1
-!          WRITE(*,*) 'Number of atoms ionized in the final state2', number_of_fin2
+!          WRITE(of,*) 'Number of atoms ionized in the final state2', number_of_fin2
         END IF
      END IF
   END DO
 
   CLOSE(UNIT=fh)
 
-  WRITE(*,*) '#initially  #final1     #final2'
-  WRITE(*,11) number_of_in, number_of_fin1, number_of_fin2
+  WRITE(of,*) '#initially  #final1     #final2'
+  WRITE(of,11) number_of_in, number_of_fin1, number_of_fin2
   11 FORMAT (' ', 3I12)
 
 END SUBROUTINE len_atarray
@@ -299,6 +309,8 @@ END SUBROUTINE read_xyz_file
 SUBROUTINE read_icd_channels(filename,channels,no_channels)
 ! Purpose: to read in all the experimental aparmeters and J, M values
 ! of the participating states
+  use control
+
   IMPLICIT NONE
 ! Data dictionary
   CHARACTER(len=100), INTENT(IN) :: filename
@@ -313,7 +325,7 @@ SUBROUTINE read_icd_channels(filename,channels,no_channels)
   REAL, DIMENSION(no_channels,15), INTENT(OUT) :: channels
 
   OPEN(fh, FILE=filename, STATUS='OLD', ACTION='READ', IOSTAT=ierror)  
-  WRITE(*,*) 'file opening: ', ierror
+!  WRITE(*,*) 'file opening: ', ierror
 
   DO WHILE (ierror == 0)
     READ(fh, '(A)', IOSTAT=ierror) buffer
@@ -328,7 +340,7 @@ SUBROUTINE read_icd_channels(filename,channels,no_channels)
       IF (LGE(dummy,'#').AND.LLE(dummy,'#')) THEN
       ELSE
         line = line + 1
-        WRITE(*,*) 'line: ', line
+!        WRITE(*,*) 'line: ', line
         READ(buffer, *, IOSTAT=ierror) (channels(line,input), input=1,15)
 !        WRITE(*,*) 'Channel ', (channels(line,input), input=1,15)
       END IF
@@ -344,6 +356,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
 !Purpose: to calculate the partial and total ICD Gammas
 
 !Modules
+  use control
   use channel_char
   use physical_constants
   use wigner3j
@@ -409,16 +422,16 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
       CASE DEFAULT
         B_MAMAp = 0
     END SELECT
-    WRITE(*,*) 'B_MAMAp= ', B_MAMAp
+    WRITE(of,*) 'B_MAMAp= ', B_MAMAp
 
     wigner   = eval_wigner3j(J_Ap,1.0,J_A,-M_Ap,M_Ap-M_A,M_A)
-!    WRITE(*,*) 'Wigner3j symbol: ', wigner
+    WRITE(of,*) 'Wigner3j symbol: ', wigner
     tau      = tottau/(1 + 1/taurel)
     tau_au   = tau * second_to_atu
-!    WRITE(*,*) 'tau_au= ', tau_au
+    WRITE(of,*) 'tau_au= ', tau_au
     sigma    = sigmaabs / (1 + 1/sigmarel)
     sigma_au = sigma * megabarn_to_sqmeter * meter_to_bohr**2
-!    WRITE(*,*) 'sigma_au = ', sigma_au
+    WRITE(of,*) 'sigma_au = ', sigma_au
 
 ! Energies used for comparison and calculation
     E_in     = SIP_in + shift_in
@@ -430,7 +443,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
 ! Test whether this channel makes sense at all
     channel_sense:IF (E_in - E_fin1 - E_fin2 > 0) THEN
   
-      WRITE(*,*) 'Processing channel ', ichannel
+      WRITE(of,*) 'Processing channel ', ichannel
 
       DO idist=1,no_dist
 
@@ -444,10 +457,10 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
 
 ! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist
         IF (E_sec >= 0.0) THEN
-          WRITE(*,*) 'E_sec= ', E_sec
+          WRITE(of,*) 'E_sec= ', E_sec
           gamma_b = 2*pi/R_bohr**6 * B_MAMAp**2 * wigner**2 *(2*J_A+1)&
                   & *3*c_au**4 *sigma_au/(16*pi**2 * omega_vp**4 * tau_au) * hartree_to_ev
-          WRITE(*,*) 'Gamma beta = ', gamma_b
+          WRITE(of,*) 'Gamma beta = ', gamma_b
           gamma_b_pairs = neq_pairs * gamma_b
           gamma_b_all_pairs = gamma_b_all_pairs + gamma_b_pairs
         END IF
@@ -456,7 +469,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
 
   END DO each_channel
 
-  WRITE(*,*) 'Sum of all Gammas for this channel and geometry ', gamma_b_all_pairs
+  WRITE(of,*) 'Sum of all Gammas for this channel and geometry ', gamma_b_all_pairs
 
 END SUBROUTINE calc_icd_gamma
 
@@ -464,6 +477,8 @@ END SUBROUTINE calc_icd_gamma
 
 SUBROUTINE calc_distances(incoord,fin2coord,distances,number_of_in,&
                          &number_of_fin2,no_pairs,no_dist)
+use control
+
 IMPLICIT NONE
 
 ! Data dictionary
@@ -485,13 +500,13 @@ IMPLICIT NONE
     xyz_in = incoord(i:i,1:3)
     xyz_fin = fin2coord(j:j,1:3)
     distances(row) = dist(xyz_in,xyz_fin)
-!    WRITE (*,*) "Distance ", row, "is ", distances(row)
+!    WRITE (of,*) "Distance ", row, "is ", distances(row)
     row = row+1
     END DO
   END DO
 
   no_dist = no_ind_entries(distances,no_pairs)
-  WRITE(*,*) 'Number of independent distances: ', no_dist
+  WRITE(of,*) 'Number of independent distances: ', no_dist
 
 END SUBROUTINE calc_distances
 
@@ -502,6 +517,8 @@ SUBROUTINE create_dist_stat(distances,dist_stat,no_pairs,no_dist)
 ! Purpose: To take the array distances and to write an new array
 !          dist_stat containing how often a distance is invoked
 !          and the distance itself
+
+  use control
 
   IMPLICIT NONE
   
@@ -559,7 +576,7 @@ REAL FUNCTION dist (xyz_in, xyz_fin)
     diff = xyz_in(1,i) - xyz_fin(1,i)
     square = diff**2
     sum_squares = sum_squares + square
-!    WRITE(*,*) 'Diff: ', diff
+!    WRITE(of,*) 'Diff: ', diff
   ENDDO
 
   dist = SQRT(sum_squares)

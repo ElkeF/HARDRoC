@@ -69,7 +69,7 @@ REAL FUNCTION eval_wigner3j(j1,j2,j3,m1,m2,m3)
      END IF
    END IF
 
-   WRITE(*,*) 'kmax= ', kmax
+!   WRITE(*,*) 'kmax= ', kmax
 
    prefactor = SQRT(fact(zaehler1)*fact(zaehler2)*fact(zaehler3)*(2*j1+1)/fact(nenner1))
    adddiff   = fact(j1add)*fact(j1diff)*fact(j2add)*fact(j2diff)*fact(j3add)*fact(j3diff)
@@ -95,7 +95,7 @@ REAL FUNCTION eval_wigner3j(j1,j2,j3,m1,m2,m3)
    vc_coef = 0.0 
  END IF delta
 
- WRITE(*,*) 'vc_coef= ', vc_coef
+! WRITE(*,*) 'vc_coef= ', vc_coef
  eval_wigner3j = (-1)**expon/SQRT(2*j1+1) * vc_coef
 
 END FUNCTION eval_wigner3j
