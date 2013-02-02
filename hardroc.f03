@@ -109,7 +109,7 @@ pairs:IF (do_pairs) THEN
 
   DEALLOCATE(distances)
 
-  CALL calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
+  CALL calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
   DEALLOCATE(channels)
 
 END IF pairs
@@ -352,7 +352,7 @@ SUBROUTINE read_icd_channels(filename,channels,no_channels)
 END SUBROUTINE read_icd_channels
 
 
-SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
+SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 !Purpose: to calculate the partial and total ICD Gammas
 
 !Modules
@@ -364,7 +364,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
   IMPLICIT NONE
 
 !Data dictionary: arrays
-  INTEGER, INTENT(IN) :: no_channels,no_dist
+  INTEGER, INTENT(IN) :: no_channels,no_dist,number_of_in
   REAL, DIMENSION(no_channels,15), INTENT(IN) :: channels
   REAL, DIMENSION(no_dist,2) :: dist_stat
 
@@ -459,7 +459,8 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist)
         IF (E_sec >= 0.0) THEN
           WRITE(of,*) 'E_sec= ', E_sec
           gamma_b = 2*pi/R_bohr**6 * B_MAMAp**2 * wigner**2 *(2*J_A+1)&
-                  & *3*c_au**4 *sigma_au/(16*pi**2 * omega_vp**4 * tau_au) * hartree_to_ev
+                  & *3*c_au**4 *sigma_au/(16*pi**2 * omega_vp**4 * tau_au) * hartree_to_ev&
+                  & / number_of_in !Normalize to one ionization
           WRITE(of,*) 'Gamma beta = ', gamma_b
           gamma_b_pairs = neq_pairs * gamma_b
           gamma_b_all_pairs = gamma_b_all_pairs + gamma_b_pairs
