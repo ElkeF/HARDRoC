@@ -1,3 +1,5 @@
 important for input file:
  - xyz-file is not allowed to have a space before atom type
  - no number of atoms in the cluster is allowed at the beginning
+ - double line in channel file will lead to doublication in sum over all
+   decay rates. Still, the sum over all single rates in ICD_* is correct.
