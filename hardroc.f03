@@ -392,6 +392,10 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
   REAL :: gamma_b_pairs !Decay rate considering all equivalent pairs
   REAL :: gamma_b_all_pairs=0.0 !Sum of all gamma_b_pairs
 
+! Data dictionary: outputfile variables
+  CHARACTER(len=15) :: specfile
+  INTEGER :: ierror=0
+
   each_channel:DO ichannel=1,no_channels
   
   ! Assign channel parameters to values in module channel_char
@@ -439,6 +443,17 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
     E_fin2   = SIP_fin2 + shift_fin2
     omega_vp = (E_in - E_fin1) * ev_to_hartree
 
+! Open the specfile for output
+    IF (INT(M_Ap) >= 0) THEN
+      WRITE(specfile, '(A4,3(I1,A1),I1)') 'ICD_', INT(2*J_A), '_', INT(2*J_Ap)&
+                                        & ,'_', INT(2*M_Ap),'_', INT(2*j_Bp)
+    ELSE
+      WRITE(specfile, '(A4,2(I1,A1),I2,A1,I1)') 'ICD_', INT(2*J_A), '_', INT(2*J_Ap)&
+                                                & ,'_', INT(2*M_Ap),'_', INT(2*j_Bp)
+    END IF
+    OPEN(ICD_outf,FILE=TRIM(ADJUSTL(specfile)),STATUS='UNKNOWN',ACTION='WRITE'&
+        &,IOSTAT=ierror)
+
 
 ! Test whether this channel makes sense at all
     channel_sense:IF (E_in - E_fin1 - E_fin2 > 0) THEN
@@ -464,9 +479,15 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
           WRITE(of,*) 'Gamma beta = ', gamma_b
           gamma_b_pairs = neq_pairs * gamma_b
           gamma_b_all_pairs = gamma_b_all_pairs + gamma_b_pairs
+
+!Write result to specfile
+          WRITE(ICD_outf,141) E_sec, gamma_b_pairs
+          141 FORMAT (' ',F12.4,ES15.5)
         END IF
       END DO
     END IF channel_sense
+
+    CLOSE(ICD_outf)
 
   END DO each_channel
 

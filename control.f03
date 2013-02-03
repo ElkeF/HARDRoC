@@ -7,5 +7,7 @@ CHARACTER(2) :: in_atom_type = '', fin_atom_type1 = '', fin_atom_type2 = ''
 !Output file variables
 ! Data dictionary: io number start of output files
 !CHARACTER(len=30) :: nmout !Name of the output file
-INTEGER :: of = 30
+INTEGER,PARAMETER :: of = 30
+INTEGER :: ICD_outf = of+1
+INTEGER :: ETMD_outf = of+20
 END MODULE control
