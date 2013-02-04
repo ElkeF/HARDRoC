@@ -2,11 +2,46 @@ MODULE geometry_fun
 
 CONTAINS
 
+REAL FUNCTION scalar_prod_row(vec1,vec2,length)
+! Purpose: to calculate the scalar product of two row vectors
+! of the same length
+
+  IMPLICIT NONE
+
+! Data dictionary: input
+  INTEGER, INTENT(IN) :: length
+  REAL, DIMENSION(1,3), INTENT(IN) :: vec1, vec2
+
+! Data dictionary: Temporary variables  
+  REAL :: prod
+
+! Data dictionary: Counters
+  INTEGER :: i
+
+  scalar_prod_row = 0.0
+
+  DO i=1,length
+  
+    prod            = vec1(1,i) * vec2(1,i)
+    scalar_prod_row = scalar_prod_row + prod
+
+  END DO
+
+END FUNCTION scalar_prod_row
+
+
+
+
+
+
 FUNCTION eval_com2(xyz1,xyz2)
 ! Purpose: to calculate the center of mass of two atoms
 ! the coordinates are red in as row vectors and the atomic masses
 ! are taken from the module atomic_masses. The atom types are stored
 ! in the module control.
+!
+! Important: This funtion returns an array, therefore the type declaration
+! is done in the declaration part, not at the beginning
 
   use control
   use atomic_masses
