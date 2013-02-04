@@ -2,6 +2,61 @@ MODULE geometry_fun
 
 CONTAINS
 
+FUNCTION eval_com2(xyz1,xyz2)
+! Purpose: to calculate the center of mass of two atoms
+! the coordinates are red in as row vectors and the atomic masses
+! are taken from the module atomic_masses. The atom types are stored
+! in the module control.
+
+  use control
+  use atomic_masses
+
+  IMPLICIT NONE
+
+! Data dictionary: input parameters
+  REAL, DIMENSION(1,3), INTENT(IN) :: xyz1,xyz2
+
+! Data dictionary: Output array
+  REAL, DIMENSION(1,3) :: eval_com2
+
+! Temporary variables
+  CHARACTER(len=2), DIMENSION(2) :: atom_types
+  REAL, DIMENSION(2) :: masses
+  REAL :: sum_m=0.0
+  REAL,DIMENSION(1,3) :: sum_m_r=0.0
+
+! Counters
+  INTEGER :: i
+
+  atom_types(1) = in_atom_type
+  atom_types(2) = fin_atom_type1
+
+
+  DO i=1,2
+    SELECT CASE(atom_types(i))
+      CASE ('Ar')
+        masses(i) = m_Ar
+      CASE ('Xe')
+        masses(i) = m_Xe
+      CASE default
+        WRITE(of,*) 'Invalid atom type.'
+    END SELECT
+    
+    sum_m   = sum_m + masses(i)
+
+  END DO
+
+  sum_m_r   = masses(1)*xyz1 + xyz2*masses(2)
+
+  eval_com2 = sum_m_r / sum_m
+
+END FUNCTION eval_com2
+
+
+
+
+
+
 REAL FUNCTION dist (xyz_in, xyz_fin)
 ! Purpose: Evaluate the distance between two atoms defined
 ! by the 3D coordinates in incoord(i,1:3) and fin2coord(j,1:3)  
