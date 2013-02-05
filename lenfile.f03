@@ -2,6 +2,7 @@ MODULE lenfile
 
 CONTAINS
 
+
 INTEGER FUNCTION len_file(filename)
 ! Purpose: determine the number of non commented lines in a given file
  IMPLICIT NONE
