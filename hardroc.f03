@@ -11,8 +11,9 @@ use input_routines
 use calc_geometry
 use icd_calc
 use lenfile
+use array_operations
 use wigner3j
-use physical_constants
+!use physical_constants
 IMPLICIT NONE
 
 !Data dictionary: Parameters for Inputfile reading
@@ -27,7 +28,7 @@ CHARACTER(len=106)  :: nmout != 'output'
 INTEGER :: number_of_in, number_of_fin1, number_of_fin2
 INTEGER :: allocstatin=0, allocstatfin1=0, allocstatfin2=0
 INTEGER :: ierror = 0 ! used for outputfile
-INTEGER :: no_pairs, no_triples, no_dist
+INTEGER :: no_pairs, no_triples, no_dist, no_ind_triples
 INTEGER :: no_channels ! How many lines the file channels has
 
 
@@ -43,6 +44,7 @@ REAL, ALLOCATABLE, DIMENSION(:)   :: distances !array of distances for ICD
 REAL, ALLOCATABLE, DIMENSION(:,:) :: dist_stat !number distance | distance
 REAL, ALLOCATABLE, DIMENSION(:,:) :: channels  ! array specifying the parameters of the icd channels
 REAL, ALLOCATABLE, DIMENSION(:,:) :: jacobi3 ! array to hold jacobi coords of all triples
+REAL, ALLOCATABLE, DIMENSION(:,:) :: triple_parameters !no Q R theta Coulomb_dist
 
 
 ! The control file name is the first command-line argument
@@ -129,6 +131,17 @@ triples:IF (do_triples) THEN
 
   CALL calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
                   &,number_of_fin2,number_of_fin2,no_triples)
+
+! Determine the number of independent entries in the array jacobi3
+  no_ind_triples = diff_rows(jacobi3,no_triples,4)
+  
+  WRITE(*,*) 'Number of triples: ', no_triples
+  WRITE(*,*) 'Number of independent triples: ', no_ind_triples
+
+! Allocate the array of the statistical triple parameters
+  ALLOCATE(triple_parameters(no_ind_triples,5))
+
+  CALL shrink_rows(jacobi3,triple_parameters,no_triples,no_ind_triples,4)
 
 END IF triples
 

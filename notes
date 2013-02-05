@@ -4,3 +4,5 @@ important for input file:
  - double line in channel file will lead to doublication in sum over all
    decay rates. Still, the sum over all single rates in ICD_* is correct.
  - atfin1 makes only sense for ETMD, it is not used for ICD
+ - COM an kleinem System ueberpruefen
+ - viel zu viele unterschiedliche

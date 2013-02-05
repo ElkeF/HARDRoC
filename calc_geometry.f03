@@ -159,8 +159,8 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
   END DO  
 
 
-
 END SUBROUTINE calc_triples
+
 
 
 END MODULE calc_geometry
