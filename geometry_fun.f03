@@ -2,6 +2,46 @@ MODULE geometry_fun
 
 CONTAINS
 
+REAL FUNCTION norm_row(vec,length)
+! Purpose: to calculate the length of a vector or corresponding
+! the norm.
+
+  use control
+
+  IMPLICIT NONE
+
+! Data dictionary: Input variables
+  INTEGER, INTENT(IN) :: length
+  REAL, DIMENSION(1,length), INTENT(IN) :: vec
+
+! Data dictionary: Temporary variables
+  REAL :: square, sum_squares
+  
+! Data dictionary: Counters
+  INTEGER :: i
+
+  sum_squares = 0.0
+
+!  WRITE(of,*) 'Sum of Squares ', sum_squares
+
+  DO i=1,length
+
+    square      = vec(1,i)**2
+    sum_squares = sum_squares + square
+
+!    WRITE(of,*) 'Square: ', square
+!    WRITE(of,*) 'Sum of Squares: ', sum_squares
+
+  END DO
+
+  norm_row = SQRT(sum_squares)
+
+END FUNCTION norm_row
+
+
+
+
+
 REAL FUNCTION scalar_prod_row(vec1,vec2,length)
 ! Purpose: to calculate the scalar product of two row vectors
 ! of the same length
