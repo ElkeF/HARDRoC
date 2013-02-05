@@ -3,3 +3,4 @@ important for input file:
  - no number of atoms in the cluster is allowed at the beginning
  - double line in channel file will lead to doublication in sum over all
    decay rates. Still, the sum over all single rates in ICD_* is correct.
+ - atfin1 makes only sense for ETMD, it is not used for ICD
