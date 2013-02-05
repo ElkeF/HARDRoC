@@ -84,4 +84,83 @@ END SUBROUTINE create_dist_stat
 
 
 
+
+SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
+                      &,number_of_fin1,number_of_fin2,no_triples)
+
+  use control
+  use geometry_fun
+
+  IMPLICIT NONE
+
+!Data dictionary: Input coordinates and output
+  INTEGER, INTENT(IN) :: number_of_in,number_of_fin1,number_of_fin2,no_triples
+  REAL, INTENT(IN), DIMENSION(number_of_in,3) :: incoord
+  REAL, INTENT(IN), DIMENSION(number_of_fin1,3) :: fin1coord
+  REAL, INTENT(IN), DIMENSION(number_of_fin2,3) :: fin2coord
+  REAL, DIMENSION(no_triples,4) :: jacobi3
+
+! Data dictionary: counters
+  INTEGER :: i,j,k,l,row=1
+
+! Temporary arrays and output variables
+  REAL, DIMENSION(1,3) :: xyz_in,xyz_fin1,xyz_fin2
+  REAL, DIMENSION(1,3) :: COM
+  REAL, DIMENSION(1,3) :: a_vec,b_vec
+  REAL :: distance
+  REAL :: thresh = 1E-3
+  REAL :: R,Q,theta,Coulomb_dist
+
+  WRITE(of,*) 'Parameters of triples'
+
+! Assign the temp arrays and calculate the geometry parameters
+! for all possible combinations
+  DO i=1,number_of_in
+    xyz_in = incoord(i:i,1:3)
+    DO j=1,number_of_fin1
+      xyz_fin1 = fin1coord(j:j,1:3)
+      DO k=1,number_of_fin2
+        xyz_fin2 = fin2coord(k:k,1:3)
+
+! Only evaluate parameters of fin1coord and fin2coord are not the same
+        distance = dist(xyz_fin1,xyz_fin2)
+!        WRITE(of,*) 'Distance between final ', distance
+        not_same:IF (distance > thresh) THEN
+
+          COM = eval_com2(xyz_in,xyz_fin1)
+!          WRITE(of,*) 'COM= ', COM
+!          WRITE(of,*) 'xyz_in= ', xyz_in
+!          WRITE(of,*) 'xyz_fin1= ', xyz_fin1
+!          WRITE(of,*) 'xyz_fin2= ', xyz_fin2
+
+          a_vec = xyz_in - COM
+          b_vec = xyz_fin2 - COM
+
+          Q = dist(xyz_in,xyz_fin1)
+          R = dist(COM,xyz_fin2)
+          theta = scalar_prod_row(a_vec,b_vec,3)/(norm_row(a_vec,3)*norm_row(b_vec,3))
+          Coulomb_dist = dist(xyz_fin1,xyz_fin2)
+
+
+          jacobi3(row,1) = Q
+          jacobi3(row,2) = R
+          jacobi3(row,3) = theta
+          jacobi3(row,4) = Coulomb_dist
+
+
+!          WRITE(of,130) (jacobi3(row,l),l=1,4)
+          130 FORMAT(' ',4F8.3)
+
+          row = row + 1
+
+        END IF not_same
+      END DO
+    END DO
+  END DO  
+
+
+
+END SUBROUTINE calc_triples
+
+
 END MODULE calc_geometry

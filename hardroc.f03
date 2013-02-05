@@ -27,7 +27,7 @@ CHARACTER(len=106)  :: nmout != 'output'
 INTEGER :: number_of_in, number_of_fin1, number_of_fin2
 INTEGER :: allocstatin=0, allocstatfin1=0, allocstatfin2=0
 INTEGER :: ierror = 0 ! used for outputfile
-INTEGER :: no_pairs, no_dist
+INTEGER :: no_pairs, no_triples, no_dist
 INTEGER :: no_channels ! How many lines the file channels has
 
 
@@ -41,7 +41,8 @@ REAL, ALLOCATABLE, DIMENSION(:,:) :: fin1coord ! coordinates of fin1
 REAL, ALLOCATABLE, DIMENSION(:,:) :: fin2coord !coords of fin2
 REAL, ALLOCATABLE, DIMENSION(:)   :: distances !array of distances for ICD
 REAL, ALLOCATABLE, DIMENSION(:,:) :: dist_stat !number distance | distance
-REAL, ALLOCATABLE, DIMENSION(:,:) :: channels  ! array specifying the parameters of the channels
+REAL, ALLOCATABLE, DIMENSION(:,:) :: channels  ! array specifying the parameters of the icd channels
+REAL, ALLOCATABLE, DIMENSION(:,:) :: jacobi3 ! array to hold jacobi coords of all triples
 
 
 ! The control file name is the first command-line argument
@@ -74,7 +75,7 @@ CALL read_xyz_file(xyz_file,incoord,fin1coord,fin2coord,&
      &             number_of_in,number_of_fin1,number_of_fin2)
 
 ! Write this to ouput file in the end, skipping now
-WRITE(of,120) incoord
+!WRITE(of,120) incoord ! Take care wrong order in print out! todo
 120 FORMAT(' ',3F8.3)
 
 !Display the physical constants used
@@ -114,13 +115,21 @@ pairs:IF (do_pairs) THEN
 
   CALL calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
   DEALLOCATE(channels)
+  DEALLOCATE(dist_stat)
 
 END IF pairs
 
 
 
-
 triples:IF (do_triples) THEN
+  
+  no_triples = number_of_in*number_of_fin1*number_of_fin2
+
+  ALLOCATE(jacobi3(no_triples,4))
+
+  CALL calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
+                  &,number_of_fin2,number_of_fin2,no_triples)
+
 END IF triples
 
 END PROGRAM hardroc
