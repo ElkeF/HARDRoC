@@ -127,18 +127,26 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
 !        WRITE(of,*) 'Distance between final ', distance
         not_same:IF (distance > thresh) THEN
 
-          COM = eval_com2(xyz_in,xyz_fin1)
-!          WRITE(of,*) 'COM= ', COM
-!          WRITE(of,*) 'xyz_in= ', xyz_in
-!          WRITE(of,*) 'xyz_fin1= ', xyz_fin1
-!          WRITE(of,*) 'xyz_fin2= ', xyz_fin2
+          COM = eval_com2(xyz_in,xyz_fin1) !checked
+          WRITE(of,*) 'COM= ', COM
+          WRITE(of,*) 'xyz_in= ', xyz_in
+          WRITE(of,*) 'xyz_fin1= ', xyz_fin1
+          WRITE(of,*) 'xyz_fin2= ', xyz_fin2
 
-          a_vec = xyz_in - COM
-          b_vec = xyz_fin2 - COM
+          a_vec = xyz_in - COM ! checked
+          b_vec = xyz_fin2 - COM ! checked
+
+          WRITE(of,*) 'a_vec: ', a_vec
+          WRITE(of,*) 'b_vec: ', b_vec
+
+!          WRITE(of,*) 'norm a_vec: ', norm_row(a_vec,3) !checked
+!          WRITE(of,*) 'norm b_vec: ', norm_row(b_vec,3) !checked
+!          WRITE(of,*) 'Scalar product a_vec,b_vec: ', scalar_prod_row(a_vec,b_vec,3)! checked
+
 
           Q = dist(xyz_in,xyz_fin1)
           R = dist(COM,xyz_fin2)
-          theta = scalar_prod_row(a_vec,b_vec,3)/(norm_row(a_vec,3)*norm_row(b_vec,3))
+          theta = ACOS(scalar_prod_row(a_vec,b_vec,3)/(norm_row(a_vec,3)*norm_row(b_vec,3)))
           Coulomb_dist = dist(xyz_fin1,xyz_fin2)
 
 
@@ -148,7 +156,7 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
           jacobi3(row,4) = Coulomb_dist
 
 
-!          WRITE(of,130) (jacobi3(row,l),l=1,4)
+          WRITE(of,130) (jacobi3(row,l),l=1,4)
           130 FORMAT(' ',4F8.3)
 
           row = row + 1
