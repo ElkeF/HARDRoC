@@ -26,6 +26,9 @@ REAL :: shift_fin2 = 0.0 !Shift due to surroundings
 REAL :: sigmaabs = 0.0 !ionization cross section of atom B
 REAL :: sigmarel = 0.0 !relation of sigma, sigma_lowerSIP/sigma_higherSIP
 
+! ETMD properties
+REAL :: J_D = 8.8 ! Total angular momentum of the donor atom in the e transition
+REAL :: M_D = 8.8 ! Projection of J_D
 
 
 END MODULE
