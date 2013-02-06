@@ -143,6 +143,10 @@ triples:IF (do_triples) THEN
 
   CALL shrink_rows(jacobi3,triple_parameters,no_triples,no_ind_triples,4)
 
+! Now we have the much smaller array containing the parameters of the triples
+! and we deallocate the huge array
+  DEALLOCATE(jacobi3)
+
 END IF triples
 
 END PROGRAM hardroc
