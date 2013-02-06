@@ -232,6 +232,50 @@ END SUBROUTINE read_icd_channels
 
 
 
+SUBROUTINE read_etmd_channels(filename,channels,no_channels)
+! Purpose: to read in all the experimental aparmeters and J, M values
+! of the participating states
+  use control
+
+  IMPLICIT NONE
+! Data dictionary
+  CHARACTER(len=100), INTENT(IN) :: filename
+  CHARACTER(len=200) :: buffer
+  CHARACTER(len=1) :: dummy
+  INTEGER :: pos
+  INTEGER, PARAMETER :: fh = 17
+  INTEGER :: ierror = 0
+  INTEGER :: line = 0
+  INTEGER :: input ! counter for input parameters
+  INTEGER, INTENT(IN) :: no_channels
+  REAL, DIMENSION(no_channels,11), INTENT(OUT) :: channels
+
+  OPEN(fh, FILE=filename, STATUS='OLD', ACTION='READ', IOSTAT=ierror)  
+!  WRITE(*,*) 'file opening: ', ierror
+
+  DO WHILE (ierror == 0)
+    READ(fh, '(A)', IOSTAT=ierror) buffer
+
+    IF (ierror == 0) THEN
+! Find first white space
+! If the first character is #, then don't consider this line
+      pos = scan(buffer, '    ')
+      dummy = TRIM(buffer(1:pos))
+      buffer = buffer(pos+1:)
+
+      IF (LGE(dummy,'#').AND.LLE(dummy,'#')) THEN
+      ELSE
+        line = line + 1
+!        WRITE(*,*) 'line: ', line
+        READ(buffer, *, IOSTAT=ierror) (channels(line,input), input=1,11)
+!        WRITE(*,*) 'Channel ', (channels(line,input), input=1,15)
+      END IF
+    END IF
+  END DO
+
+  CLOSE(fh)
+
+END SUBROUTINE read_etmd_channels
 
 
 

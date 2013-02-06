@@ -12,14 +12,17 @@ use calc_geometry
 use icd_calc
 use lenfile
 use array_operations
-use wigner3j
+use select_parameters
+!use wigner3j
 !use physical_constants
 IMPLICIT NONE
 
 !Data dictionary: Parameters for Inputfile reading
 CHARACTER(len=100) :: ctrl_file !Filename of the controlfile
 CHARACTER(len=100) :: xyz_file  !Filename of the xyz-file
-CHARACTER(len=100) :: icd_channel_file  !Filename of the xyz-file
+CHARACTER(len=100) :: icd_channel_file  !Filename
+CHARACTER(len=100) :: etmd_channel_file  !Filename
+
 
 !Data dictionary: wirting output
 CHARACTER(len=106)  :: nmout != 'output'
@@ -50,7 +53,19 @@ REAL, ALLOCATABLE, DIMENSION(:,:) :: triple_parameters !no Q R theta Coulomb_dis
 ! The control file name is the first command-line argument
 CALL get_command_argument(1, ctrl_file)
 CALL get_command_argument(2, xyz_file)
-CALL get_command_argument(3, icd_channel_file)
+IF (do_pairs) THEN
+  IF (do_triples) THEN
+    CALL get_command_argument(3, icd_channel_file)
+    CALL get_command_argument(4, etmd_channel_file)
+  ELSE
+    CALL get_command_argument(3, icd_channel_file)
+  END IF
+ELSE
+  IF(do_triples) THEN
+    CALL get_command_argument(3, etmd_channel_file)
+  END IF
+END IF
+
 
 !Set name of the outputfile
 WRITE(nmout,*) TRIM(xyz_file)//'.out'
@@ -125,6 +140,14 @@ END IF pairs
 
 triples:IF (do_triples) THEN
   
+  no_channels = len_file(etmd_channel_file)
+  WRITE(of,*) 'Number of ETMD channels', no_channels
+
+! Allocate the array for the channels array
+  ALLOCATE(channels(no_channels,11))
+
+  CALL read_etmd_channels(etmd_channel_file,channels,no_channels)
+
   no_triples = number_of_in*number_of_fin1*number_of_fin2
 
   ALLOCATE(jacobi3(no_triples,4))
