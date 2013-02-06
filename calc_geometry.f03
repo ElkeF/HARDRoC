@@ -111,6 +111,10 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
   REAL :: thresh = 1E-3
   REAL :: R,Q,theta,Coulomb_dist
 
+! Very important, otherwise strange entries appear later, when the array
+! is not completely filled
+  jacobi3 = 0.0 
+
   WRITE(of,*) 'Parameters of triples'
 
 ! Assign the temp arrays and calculate the geometry parameters
