@@ -170,6 +170,14 @@ triples:IF (do_triples) THEN
 ! and we deallocate the huge array
   DEALLOCATE(jacobi3)
 
+! We have read in everything, now we need to get the corresponding values
+! and calculate Gamma
+
+
+! Clean up rest of triple arrays
+  DEALLOCATE(triple_parameters)
+  DEALLOCATE(channels)
+
 END IF triples
 
 END PROGRAM hardroc
