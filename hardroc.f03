@@ -10,6 +10,7 @@ use control
 use input_routines
 use calc_geometry
 use icd_calc
+use etmd_calc
 use lenfile
 use array_operations
 use select_parameters
@@ -172,7 +173,8 @@ triples:IF (do_triples) THEN
 
 ! We have read in everything, now we need to get the corresponding values
 ! and calculate Gamma
-
+  CALL calc_etmd_gamma(channels,triple_parameters,no_channels,&
+                       no_ind_triples,number_of_in)
 
 ! Clean up rest of triple arrays
   DEALLOCATE(triple_parameters)
