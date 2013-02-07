@@ -67,10 +67,11 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 
 
 ! Energies used for comparison and calculation
-    E_in     = SIP_in + shift_in
-    E_fin1   = SIP_fin1 + shift_fin1
-    E_fin2   = SIP_fin2 + shift_fin2
-    omega_vp = (E_in - E_fin1) * ev_to_hartree
+    E_in        = SIP_in + shift_in
+    E_fin1      = SIP_fin1 + shift_fin1
+    E_fin2      = SIP_fin2 + shift_fin2
+    omega_vp_ev = E_in - E_fin1
+    omega_vp    = (E_in - E_fin1) * ev_to_hartree
 
 
 ! Determine the ionization cross section
