@@ -33,8 +33,35 @@ SUBROUTINE select_trdm_fit_para(factor,alpha,const)
                     factor = ArXe_1_1_3_3_factor
                     alpha  = ArXe_1_1_3_3_alpha
                     const  = ArXe_1_1_3_3_const
+                  CASE(1)
+                    factor = ArXe_1_1_3_1_factor
+                    alpha  = ArXe_1_1_3_1_alpha
+                    const  = ArXe_1_1_3_1_const
+                  CASE(-1)
+                    factor = ArXe_1_1_3_m1_factor
+                    alpha  = ArXe_1_1_3_m1_alpha
+                    const  = ArXe_1_1_3_m1_const
                   CASE DEFAULT
                     WRITE(of,*) 'No TRDM provided for this M_D.'
+                    factor = 0
+                    alpha  = 0
+                    const  = 0
+                END SELECT
+              CASE(1)
+                SELECT CASE(INT(2*M_D))
+                  CASE(1)
+                    factor = ArXe_1_1_1_1_factor
+                    alpha  = ArXe_1_1_1_1_alpha
+                    const  = ArXe_1_1_1_1_const
+                  CASE(-1)
+                    factor = ArXe_1_1_1_m1_factor
+                    alpha  = ArXe_1_1_1_m1_alpha
+                    const  = ArXe_1_1_1_m1_const
+                  CASE DEFAULT
+                    WRITE(of,*) 'No TRDM provided for this M_D.'
+                    factor = 0
+                    alpha  = 0
+                    const  = 0
                 END SELECT
               CASE DEFAULT
                 WRITE(of,*) 'No TRDM provided for this value of J_D.'
