@@ -114,7 +114,7 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
       WRITE(of,*) 'Processing all values of M_Donor'
 
 
-      WRITE(specfile, '(A4,2(I1,A1),A4,I1)') 'ICD_', INT(2*J_A), '_', INT(2*J_D)&
+      WRITE(specfile, '(A5,2(I1,A1),A4,I1)') 'ETMD_', INT(2*J_A), '_', INT(2*J_D)&
                                           & ,'_', 'all_', INT(2*j_Bp)
 
 ! Open the specfile for output
@@ -207,10 +207,10 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 
 ! Open the specfile for output
       IF (INT(M_D) >= 0) THEN
-        WRITE(specfile, '(A4,3(I1,A1),I1)') 'ETMD_', INT(2*J_A), '_', INT(2*J_D)&
+        WRITE(specfile, '(A5,3(I1,A1),I1)') 'ETMD_', INT(2*J_A), '_', INT(2*J_D)&
                                           & ,'_', INT(2*M_D),'_', INT(2*j_Bp)
       ELSE
-        WRITE(specfile, '(A4,2(I1,A1),I2,A1,I1)') 'ETMD_', INT(2*J_A), '_', INT(2*J_D)&
+        WRITE(specfile, '(A5,2(I1,A1),I2,A1,I1)') 'ETMD_', INT(2*J_A), '_', INT(2*J_D)&
                                                   & ,'_', INT(2*M_Ap),'_', INT(2*j_D)
       END IF
       OPEN(ETMD_outf,FILE=TRIM(ADJUSTL(specfile)),STATUS='UNKNOWN',ACTION='WRITE'&
@@ -270,7 +270,7 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
         END DO
       END IF channel_sense
 
-      CLOSE(ICD_outf)
+      CLOSE(ETMD_outf)
 
    END IF calc_them_all
 
