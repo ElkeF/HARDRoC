@@ -138,7 +138,7 @@ triples:IF (do_triples) THEN
   WRITE(of,*) 'Number of ETMD channels', no_channels
 
 ! Allocate the array for the channels array
-  ALLOCATE(channels(no_channels,11))
+  ALLOCATE(channels(no_channels,12))
 
   CALL read_etmd_channels(etmd_channel_file,channels,no_channels)
 

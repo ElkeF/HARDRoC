@@ -13,10 +13,12 @@ INTEGER FUNCTION len_file(filename)
  INTEGER :: pos
  INTEGER, PARAMETER :: fh = 16
  INTEGER :: ierror = 0
- INTEGER :: line = 0
+ INTEGER :: line
 
  OPEN(fh, FILE=filename, STATUS='OLD', ACTION='READ', IOSTAT=ierror)
  WRITE(*,*) 'ierror: ', ierror
+
+ line = 0
 
  DO WHILE (ierror == 0)
    READ(fh, '(A)', IOSTAT=ierror) buffer
