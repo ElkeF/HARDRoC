@@ -127,14 +127,25 @@ def one_over_x(x):
     #   Additive constant            : const
     return factor() / x + const
 
+def poly2_m1(x):
+    # A polynomial ax^2 + bx + c + d/r
+    #   Prefactor of x^2             : quad
+    #   Prefactor of x               : lin
+    #   Constant term                : const
+    #   Prefactor of 1/x             : oneover
+    return quad()*x**2 + lin()*x + const() + oneover()/x
+
 ## Choose function
-func = one_over_x
+func = poly2_m1
 ## Define the fit parameters, guessing some starting values
 #factor  = Parameter("factor",1)
 #alpha   = Parameter("alpha",0.5)
 #const   = Parameter("const",3)
-factor  = Parameter("factor",)
-const   = Parameter("const",)
+quad    = Parameter("quad",1)
+lin     = Parameter("lin",1)
+const   = Parameter("const",1)
+oneover = Parameter("oneover",1)
+
 # This converges to a negative y_peak if x0=1170, but fits perfectly if x0=1171.
 #   One can't assume that a fit will produce sensible results.
 #x0      = Parameter("x0",1171.0)
@@ -147,17 +158,17 @@ const   = Parameter("const",)
 #    print "\nInvalid width parameter name.\n"
     
     
-p=[factor,alpha,const]
+p=[quad,lin,const,oneover]
 
 ## Read Data
 #   unpack=True transposes lines in columns, e.g. if each line has an x, y, z
 #               triplet, then x, y, z = numpy.loadtxt will load the data into
 #               x[i], y[i], z[i] instead of xyz[i]
-filename =('ArXe.txt')
+filename =('../../exppar_lib/sigma/Xe.dat')
 data = numpy.loadtxt(filename)
 x_data  = data[:,0]
-y_data  = data[:,5]
-dy_data = data[:,6]
+y_data  = data[:,1]
+dy_data = data[:,2]
 
 #x_data, y_data, dy_data = numpy.loadtxt('ArXe_test.txt', unpack=True, skiprows=0)
 
