@@ -16,6 +16,7 @@ INTEGER FUNCTION len_file(filename)
  INTEGER :: line = 0
 
  OPEN(fh, FILE=filename, STATUS='OLD', ACTION='READ', IOSTAT=ierror)
+ WRITE(*,*) 'ierror: ', ierror
 
  DO WHILE (ierror == 0)
    READ(fh, '(A)', IOSTAT=ierror) buffer

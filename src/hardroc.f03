@@ -13,7 +13,6 @@ use icd_calc
 use etmd_calc
 use lenfile
 use array_operations
-use select_parameters
 !use wigner3j
 !use physical_constants
 IMPLICIT NONE
@@ -54,18 +53,12 @@ REAL, ALLOCATABLE, DIMENSION(:,:) :: triple_parameters !no Q R theta Coulomb_dis
 ! The control file name is the first command-line argument
 CALL get_command_argument(1, ctrl_file)
 CALL get_command_argument(2, xyz_file)
-IF (do_pairs) THEN
-  IF (do_triples) THEN
-    CALL get_command_argument(3, icd_channel_file)
-    CALL get_command_argument(4, etmd_channel_file)
-  ELSE
-    CALL get_command_argument(3, icd_channel_file)
-  END IF
-ELSE
-  IF(do_triples) THEN
-    CALL get_command_argument(3, etmd_channel_file)
-  END IF
-END IF
+CALL get_command_argument(3, icd_channel_file)
+CALL get_command_argument(4, etmd_channel_file)
+
+! Test the correct filename
+  WRITE(*,*) 'icd_file: ', icd_channel_file
+  WRITE(*,*) 'etmd_file: ', etmd_channel_file
 
 
 !Set name of the outputfile
