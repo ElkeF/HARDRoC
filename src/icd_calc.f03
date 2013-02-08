@@ -110,9 +110,9 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
   
         WRITE(of,*) 'Processing channel ', ichannel
 
-all_M_Ap:DO iM_Ap=0,(INT(2*J_Ap))
+all_M_Ap:DO iM_Ap=(INT(2*(M_A-1))),(INT(2*(-M_A+1)))
 
-          M_Ap = -J_Ap + iM_Ap
+          M_Ap = M_A + iM_Ap
 
 ! Set the M_A# dependent variables
           SELECT CASE (INT(M_Ap - M_A))

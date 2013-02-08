@@ -2,7 +2,7 @@ MODULE select_trdm_para
 
 CONTAINS
 
-SUBROUTINE select_trdm_fit_para(factor,alpha,const)
+SUBROUTINE select_trdm_fit_para(factor,alpha,const,dir)
 ! Purpose: select the correct parameters of an exponential fit of
 ! the transition dipole moments of molecules.
 
@@ -14,6 +14,7 @@ SUBROUTINE select_trdm_fit_para(factor,alpha,const)
 
 ! Data dictionary: output parameters
   REAL, INTENT(OUT) :: factor,alpha,const
+  CHARACTER(len=1), INTENT(OUT) :: dir !in which direction
 
 ! Data dictionary: 
 
@@ -33,14 +34,17 @@ SUBROUTINE select_trdm_fit_para(factor,alpha,const)
                     factor = ArXe_1_1_3_3_factor
                     alpha  = ArXe_1_1_3_3_alpha
                     const  = ArXe_1_1_3_3_const
+                    dir    = 'x'
                   CASE(1)
                     factor = ArXe_1_1_3_1_factor
                     alpha  = ArXe_1_1_3_1_alpha
                     const  = ArXe_1_1_3_1_const
+                    dir    = 'z'
                   CASE(-1)
                     factor = ArXe_1_1_3_m1_factor
                     alpha  = ArXe_1_1_3_m1_alpha
                     const  = ArXe_1_1_3_m1_const
+                    dir    = 'x'
                   CASE DEFAULT
                     WRITE(of,*) 'No TRDM provided for this M_D.'
                     factor = 0
@@ -53,10 +57,12 @@ SUBROUTINE select_trdm_fit_para(factor,alpha,const)
                     factor = ArXe_1_1_1_1_factor
                     alpha  = ArXe_1_1_1_1_alpha
                     const  = ArXe_1_1_1_1_const
+                    dir    = 'z'
                   CASE(-1)
                     factor = ArXe_1_1_1_m1_factor
                     alpha  = ArXe_1_1_1_m1_alpha
                     const  = ArXe_1_1_1_m1_const
+                    dir    = 'x'
                   CASE DEFAULT
                     WRITE(of,*) 'No TRDM provided for this M_D.'
                     factor = 0

@@ -10,12 +10,14 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
   use physical_constants
   use control
   use channel_char
+  use select_sigma_para
+  use select_trdm_para
 
   IMPLICIT NONE
 
 ! Data dictionary: Input parameters
   INTEGER, INTENT(IN) :: no_channels, no_ind_triples, number_of_in
-  REAL, DIMENSION(no_channels,11), INTENT(IN) :: channels
+  REAL, DIMENSION(no_channels,12), INTENT(IN) :: channels
   REAL, DIMENSION(no_ind_triples,5), INTENT(IN) :: triple_parameters
 
 ! Data dictionary: Parameters of the possible triples
@@ -32,17 +34,38 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
   REAL :: trdm !transition dipole moment, to be calculated from fit in trdm_library
   REAL :: omega_vp !virtual photon energy
   REAL :: omega_vp_ev !in ev
+  REAL :: sigma_abs
+  REAL :: sigma_rel
   REAL :: sigma !ionization cross section, interpolated from lib
   REAL :: sigma_au ! in atomic units
+  REAL :: trdm_x !transition dipole moment
+  REAL :: trdm_z !transition dipole moment
+  REAL :: trdm_x_au, trdm_z_au
 
 ! Data dictionary: Energies
   REAL :: E_in, E_fin1, E_fin2 !shifted energies
   REAL :: E_Coulomb !Coulomb energy
   REAL :: E_sec !Secondary electron produced in the ICD/ETMD process
 
+! Data dictionary: parameters used for calculation of the trdm
+! at a specific distance Q and ionization cross section for a given
+! energy of the virtual photon
+  REAL :: factor,alpha !trdm
+  CHARACTER(len=1) :: dir
+  REAL :: quad,lin,oneover !sigma
+  REAL :: const !both
+
 ! Data dictionary: Counters
   INTEGER :: ichannel
   INTEGER :: itriple
+  INTEGER :: iM_D !counter for loop over all M_D
+
+! Data dictionary: Results
+  REAL :: gamma_all_M
+  REAL :: gamma_b
+  REAL :: gamma_b_triple
+  REAL :: gamma_b_all_pairs
+  
 
 ! Data dictionary: outputfile variables
   CHARACTER(len=15) :: specfile
@@ -65,6 +88,7 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
     j_Bp        = channels(ichannel,9) / 2.0
     SIP_fin2    = channels(ichannel,10)
     shift_fin2  = channels(ichannel,11)
+    sigmarel    = channels(ichannel,12)
 
 
 ! Energies used for comparison and calculation
@@ -76,8 +100,157 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 
 
 ! Determine the ionization cross section
+    CALL select_sigma_fit_para(quad,lin,const,oneover)
+    sigma_abs = quad*omega_vp_ev**2 + lin*omega_vp_ev + const + oneover/omega_vp_ev
+    sigma     = sigma_abs / (1 + 1/sigmarel)
+    sigma_au  = sigma * megabarn_to_sqmeter * meter_to_bohr**2
 
 
+! Special case if M_Ap = 88 calculate gamma for all possible values of M_A'
+    calc_them_all:IF (INT(2*M_D) == 88) THEN
+
+      gamma_all_M = 0.0
+
+      WRITE(of,*) 'Processing all values of M_Donor'
+
+
+      WRITE(specfile, '(A4,2(I1,A1),A4,I1)') 'ICD_', INT(2*J_A), '_', INT(2*J_D)&
+                                          & ,'_', 'all_', INT(2*j_Bp)
+
+! Open the specfile for output
+      OPEN(ETMD_outf,FILE=TRIM(ADJUSTL(specfile)),STATUS='UNKNOWN',ACTION='WRITE'&
+          &,IOSTAT=ierror)
+
+
+! Test whether this channel makes sense at all
+      channel_sense_all:IF (E_in - E_fin1 - E_fin2 > 0) THEN
+
+        WRITE(of,*) 'Processing channel ', ichannel
+
+          all_M_Ap:DO iM_D=(INT(2*(M_A-1))),(INT(2*(-M_A+1)))
+
+          M_D = M_A + iM_D
+          WRITE(of,*) 'M_D = ', M_D
+
+! Set the M_D dependent variables
+! Transition dipole moments :-)
+          CALL select_trdm_fit_para(factor,alpha,const,dir)
+          
+          IF (dir == 'x') THEN
+            trdm_x = factor * EXP(-alpha*Q_angstrom) + const
+            trdm_z = 0.0
+          ELSE IF (dir == 'z') THEN
+            trdm_x = 0
+            trdm_z = factor * EXP(-alpha*Q_angstrom) + const
+          END IF 
+
+          WRITE(of,*) 'trdm_x', trdm_x
+          WRITE(of,*) 'trdm_z', trdm_z
+
+
+          DO itriple=1,no_ind_triples
+
+! Find values for given pair
+            neq_pairs  = INT(triple_parameters(itriple,1))
+            R_Coulomb_angstrom = triple_parameters(itriple,5)
+            R_Coulomb_bohr  = R_Coulomb_angstrom * angstrom_to_bohr
+
+            E_Coulomb  = 1/R_Coulomb_bohr * hartree_to_ev
+            E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
+
+! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist
+            IF (E_sec >= 0.0) THEN
+              WRITE(of,*) 'E_sec= ', E_sec
+!              gamma_b = 2*pi/R_bohr**6 * B_MAMAp**2 * wigner**2 *(2*J_A+1)&
+!                      & *3*c_au**4 *sigma_au/(16*pi**2 * omega_vp**4 * tau_au) * hartree_to_ev&
+!                      & / number_of_in !Normalize to one ionization
+!              WRITE(of,*) 'Gamma beta = ', gamma_b
+!              gamma_b_pairs = neq_pairs * gamma_b
+!              gamma_b_all_pairs = gamma_b_all_pairs + gamma_b_pairs
+
+            END IF
+          END DO
+
+!          gamma_all_M = gamma_all_M + gamma_b_pairs
+
+        END DO all_M_Ap
+
+!Write result to specfile
+!        WRITE(ICD_outf,141) E_sec, gamma_all_M
+        141 FORMAT (' ',F12.4,ES15.5)
+
+      END IF channel_sense_all
+
+      CLOSE(ICD_outf)
+
+
+    ELSE calc_them_all
+
+      WRITE(of,*) 'Processing values of M_D separately'
+
+!Set the M_Ap dependent variables
+! Transition dipole moments :-)
+          CALL select_trdm_fit_para(factor,alpha,const,dir)
+          
+          IF (dir == 'x') THEN
+            trdm_x = factor * EXP(-alpha*Q_angstrom) + const
+            trdm_z = 0.0
+          ELSE IF (dir == 'z') THEN
+            trdm_x = 0
+            trdm_z = factor * EXP(-alpha*Q_angstrom) + const
+          END IF 
+
+          WRITE(of,*) 'trdm_x', trdm_x
+          WRITE(of,*) 'trdm_z', trdm_z
+
+
+! Open the specfile for output
+      IF (INT(M_D) >= 0) THEN
+        WRITE(specfile, '(A4,3(I1,A1),I1)') 'ICD_', INT(2*J_A), '_', INT(2*J_D)&
+                                          & ,'_', INT(2*M_D),'_', INT(2*j_Bp)
+      ELSE
+        WRITE(specfile, '(A4,2(I1,A1),I2,A1,I1)') 'ICD_', INT(2*J_A), '_', INT(2*J_D)&
+                                                  & ,'_', INT(2*M_Ap),'_', INT(2*j_D)
+      END IF
+      OPEN(ETMD_outf,FILE=TRIM(ADJUSTL(specfile)),STATUS='UNKNOWN',ACTION='WRITE'&
+          &,IOSTAT=ierror)
+
+
+! Test whether this channel makes sense at all
+      channel_sense:IF (E_in - E_fin1 - E_fin2 > 0) THEN
+
+        WRITE(of,*) 'Processing channel ', ichannel
+
+        DO itriple=1,no_ind_triples
+
+! Find values for given triple
+          neq_pairs  = INT(triple_parameters(itriple,1))
+          R_Coulomb_angstrom = triple_parameters(itriple,2)
+          R_Coulomb_bohr  = R_Coulomb_angstrom * angstrom_to_bohr
+
+          E_Coulomb  = 1/R_Coulomb_bohr * hartree_to_ev
+          E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
+
+! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist
+          IF (E_sec >= 0.0) THEN
+            WRITE(of,*) 'E_sec= ', E_sec
+!            gamma_b = 2*pi/R_bohr**6 * B_MAMAp**2 * wigner**2 *(2*J_A+1)&
+!                    & *3*c_au**4 *sigma_au/(16*pi**2 * omega_vp**4 * tau_au) * hartree_to_ev&
+!                    & / number_of_in !Normalize to one ionization
+!            WRITE(of,*) 'Gamma beta = ', gamma_b
+!            gamma_b_pairs = neq_pairs * gamma_b
+!            gamma_b_all_pairs = gamma_b_all_pairs + gamma_b_pairs
+
+!Write result to specfile
+!            WRITE(ICD_outf,141) E_sec, gamma_b_pairs
+!            141 FORMAT (' ',F12.4,ES15.5) is already defined in all
+          END IF
+        END DO
+      END IF channel_sense
+
+      CLOSE(ICD_outf)
+
+   END IF calc_them_all
 
   END DO each_channel
 
