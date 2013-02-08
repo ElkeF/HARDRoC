@@ -131,7 +131,7 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
 !        WRITE(of,*) 'Distance between final ', distance
         not_same:IF (distance > thresh) THEN
 
-!          COM = eval_com2(xyz_in,xyz_fin1) !checked
+          COM = eval_com2(xyz_in,xyz_fin1) !checked
 !          WRITE(of,*) 'COM= ', COM
 !          WRITE(of,*) 'xyz_in= ', xyz_in
 !          WRITE(of,*) 'xyz_fin1= ', xyz_fin1
