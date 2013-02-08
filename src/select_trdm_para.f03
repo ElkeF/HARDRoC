@@ -81,4 +81,4 @@ SUBROUTINE select_trdm_fit_para(factor,alpha,const)
 
 END SUBROUTINE select_trdm_fit_para
 
-END MODULE select_trmd_para
+END MODULE select_trdm_para

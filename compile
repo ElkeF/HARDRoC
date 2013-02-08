@@ -2,4 +2,4 @@
 
 cd src
 
-gfortran -o hardroc.x physical_constants.f03 atomic_masses.f03 trdm_lib.f03 channel_char.f03 control.f03 select_parameters.f03 lenfile.f03 factorial.f03 geometry_fun.f03 array_operations.f03 wigner3j.f03 input_routines.f03 calc_geometry.f03 icd_calc.f03 etmd_calc.f03 hardroc.f03
+gfortran -o hardroc.x physical_constants.f03 atomic_masses.f03 trdm_lib.f03 channel_char.f03 control.f03 select_trdm_para.f03 lenfile.f03 factorial.f03 geometry_fun.f03 array_operations.f03 wigner3j.f03 input_routines.f03 calc_geometry.f03 icd_calc.f03 etmd_calc.f03 hardroc.f03

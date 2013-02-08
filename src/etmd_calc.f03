@@ -31,6 +31,7 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 ! Data dictionary: experimental input parameters
   REAL :: trdm !transition dipole moment, to be calculated from fit in trdm_library
   REAL :: omega_vp !virtual photon energy
+  REAL :: omega_vp_ev !in ev
   REAL :: sigma !ionization cross section, interpolated from lib
   REAL :: sigma_au ! in atomic units
 
