@@ -128,13 +128,13 @@ def one_over_x(x):
     return factor() / x + const
 
 ## Choose function
-func = one_over_x
+func = exponential
 ## Define the fit parameters, guessing some starting values
-#factor  = Parameter("factor",1)
-#alpha   = Parameter("alpha",0.5)
-#const   = Parameter("const",3)
-factor  = Parameter("factor",)
-const   = Parameter("const",)
+factor  = Parameter("factor",1)
+alpha   = Parameter("alpha",0.5)
+const   = Parameter("const",3)
+#factor  = Parameter("factor",)
+#const   = Parameter("const",)
 # This converges to a negative y_peak if x0=1170, but fits perfectly if x0=1171.
 #   One can't assume that a fit will produce sensible results.
 #x0      = Parameter("x0",1171.0)
@@ -156,7 +156,7 @@ p=[factor,alpha,const]
 filename =('ArXe.txt')
 data = numpy.loadtxt(filename)
 x_data  = data[:,0]
-y_data  = data[:,5]
+y_data  = data[:,3]
 dy_data = data[:,6]
 
 #x_data, y_data, dy_data = numpy.loadtxt('ArXe_test.txt', unpack=True, skiprows=0)
