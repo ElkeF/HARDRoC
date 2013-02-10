@@ -127,30 +127,29 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 
         WRITE(of,*) 'Processing channel ', ichannel
 
-          all_M_Ap:DO iM_D=(INT(2*(M_A-1))),(INT(2*(-M_A+1)))
-
-          M_D = M_A + iM_D
-
 
 ! Now start for each and every triple
-          DO itriple=1,no_ind_triples
+        DO itriple=1,no_ind_triples
 
 ! Find values for given triple
-            neq_pairs  = INT(triple_parameters(itriple,1))
-            Q_angstrom = triple_parameters(itriple,2)
-            R_angstrom = triple_parameters(itriple,3)
-            R_bohr     = R_angstrom * angstrom_to_bohr
-            theta      = triple_parameters(itriple,4)
-            R_Coulomb_angstrom = triple_parameters(itriple,5)
-            R_Coulomb_bohr  = R_Coulomb_angstrom * angstrom_to_bohr
+          neq_pairs  = INT(triple_parameters(itriple,1))
+          Q_angstrom = triple_parameters(itriple,2)
+          R_angstrom = triple_parameters(itriple,3)
+          R_bohr     = R_angstrom * angstrom_to_bohr
+          theta      = triple_parameters(itriple,4)
+          R_Coulomb_angstrom = triple_parameters(itriple,5)
+          R_Coulomb_bohr  = R_Coulomb_angstrom * angstrom_to_bohr
 
-            E_Coulomb  = 1/R_Coulomb_bohr * hartree_to_ev
-            E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
+          E_Coulomb  = 1/R_Coulomb_bohr * hartree_to_ev
+          E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
 
-            WRITE(of,*) 'Q_angstrom = ', Q_angstrom
+          WRITE(of,*) 'Q_angstrom = ', Q_angstrom
             !WRITE(of,*) 'R_angstrom = ', R_angstrom
 !            WRITE(of,*) 'R_bohr = ', R_bohr
 
+          all_M_Ap:DO iM_D=(INT(2*(M_A-1))),(INT(2*(-M_A+1)))
+
+            M_D = M_A + iM_D
 ! Set the M_D dependent variables
 ! Transition dipole moments :-)
             CALL select_trdm_fit_para(factor,alpha,const,dir)
@@ -185,11 +184,11 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
               gamma_b_all_triples = gamma_b_all_triples + gamma_b_triple
 
             END IF
-          END DO
+          END DO all_M_Ap
 
           gamma_all_M = gamma_all_M + gamma_b_triple
 
-        END DO all_M_Ap
+        END DO
 
 !Write result to specfile
         WRITE(ETMD_outf,141) E_sec, gamma_all_M
