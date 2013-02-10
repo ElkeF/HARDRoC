@@ -183,16 +183,16 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
               gamma_b_triple = neq_pairs * gamma_b
               gamma_b_all_triples = gamma_b_all_triples + gamma_b_triple
 
+!Write result to specfile
+              WRITE(ETMD_outf,141) E_sec, gamma_b_triple
+              141 FORMAT (' ',F12.4,ES15.5)
+
             END IF
           END DO all_M_Ap
 
-          gamma_all_M = gamma_all_M + gamma_b_triple
+          gamma_all_M = gamma_all_M + gamma_b_all_triples
 
         END DO
-
-!Write result to specfile
-        WRITE(ETMD_outf,141) E_sec, gamma_all_M
-        141 FORMAT (' ',F12.4,ES15.5)
 
       END IF channel_sense_all
 
