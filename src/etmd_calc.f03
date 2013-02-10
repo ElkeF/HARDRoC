@@ -61,9 +61,10 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
   INTEGER :: iM_D !counter for loop over all M_D
 
 ! Data dictionary: Results
-  REAL :: gamma_all_M
+  REAL :: gamma_all_triples
+  REAL :: gamma_b_all_M
   REAL :: gamma_b
-  REAL :: gamma_b_triple
+  REAL :: gamma_b_triples
   REAL :: gamma_b_all_triples
   
 
@@ -109,7 +110,7 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 ! Special case if M_Ap = 88 calculate gamma for all possible values of M_A'
     calc_them_all:IF (INT(2*M_D) == 88) THEN
 
-      gamma_all_M = 0.0
+      gamma_all_triples = 0.0
 
       WRITE(of,*) 'Processing all values of M_Donor'
 
@@ -180,17 +181,17 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
                         * c_au *sigma_au/(4*pi**2 * omega_vp) * hartree_to_ev&
                         / number_of_in !Normalize to one ionization
               WRITE(of,*) 'Gamma beta = ', gamma_b
-              gamma_b_triple = neq_pairs * gamma_b
-              gamma_b_all_triples = gamma_b_all_triples + gamma_b_triple
+              gamma_b_triples = neq_pairs * gamma_b
+              gamma_b_all_M = gamma_b_all_M + gamma_b_triples
 
 !Write result to specfile
-              WRITE(ETMD_outf,141) E_sec, gamma_b_triple
+              WRITE(ETMD_outf,141) E_sec, gamma_b_triples
               141 FORMAT (' ',F12.4,ES15.5)
 
             END IF
           END DO all_M_Ap
 
-          gamma_all_M = gamma_all_M + gamma_b_all_triples
+          gamma_all_triples = gamma_all_triples + gamma_b_all_M
 
         END DO
 
@@ -259,11 +260,11 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
                         * c_au *sigma_au/(4*pi**2 * omega_vp) * hartree_to_ev&
                         / number_of_in !Normalize to one ionization
               WRITE(of,*) 'Gamma beta = ', gamma_b
-              gamma_b_triple = neq_pairs * gamma_b
-              gamma_b_all_triples = gamma_b_all_triples + gamma_b_triple
+              gamma_b_triples = neq_pairs * gamma_b
+              gamma_b_all_triples = gamma_b_all_triples + gamma_b_triples
 
 !Write result to specfile
-            WRITE(ETMD_outf,141) E_sec, gamma_b_triple
+            WRITE(ETMD_outf,141) E_sec, gamma_b_triples
 !            141 FORMAT (' ',F12.4,ES15.5) is already defined in all
           END IF
         END DO
