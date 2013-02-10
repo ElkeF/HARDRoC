@@ -52,9 +52,9 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
   REAL :: gamma_all_M !will hold the result for all M_A' values of one distance
 
   each_channel:DO ichannel=1,no_channels
-  
 
-  ! Assign channel parameters to values in module channel_char
+
+! Assign channel parameters to values in module channel_char
     J_A         = channels(ichannel,1) / 2.0
     M_A         = channels(ichannel,2) / 2.0
     SIP_in      = channels(ichannel,3)
@@ -73,12 +73,26 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
     sigmaabs    = channels(ichannel,14)
     sigmarel    = channels(ichannel,15)
 
+
+! Write the characteristics of each channel
+    WRITE(of,*) ''
+    WRITE(of,*) ''
+    WRITE(of,210) 'Processing ICD channel ', ichannel
+    210 FORMAT (' ',A23,I3)
+    WRITE(of,*) ''
+    WRITE(of,*) 'Characterized by'
+    WRITE(of,220) 'J_A = ',INT(2*J_A),'M_A = ',INT(2*M_A),"J_A' = ",INT(2*J_Ap),&
+                  "M_A' = ",INT(2*M_Ap),"j_B' = ",INT(2*j_Bp)
+    220 FORMAT (' ',5(A7,I2,4X))
+    WRITE(of,*) ''
+    
+  
     tau      = tottau/(1 + 1/taurel)
     tau_au   = tau * second_to_atu
-    WRITE(of,*) 'tau_au= ', tau_au
+!    WRITE(of,*) 'tau_au= ', tau_au
     sigma    = sigmaabs / (1 + 1/sigmarel)
     sigma_au = sigma * megabarn_to_sqmeter * meter_to_bohr**2
-    WRITE(of,*) 'sigma_au = ', sigma_au
+!    WRITE(of,*) 'sigma_au = ', sigma_au
 
 ! Energies used for comparison and calculation
     E_in     = SIP_in + shift_in
@@ -96,6 +110,13 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
       gamma_b_all_M = 0.0
 
       WRITE(of,*) 'Processing all values of M_A prime'
+!      WRITE(of,*) ''
+      WRITE(of,*) 'All decay rates are given in eV'
+      WRITE(of,*) ''
+      WRITE(of,230) 'J_A','M_A',"J_A'","j_B'",'no pairs','R [AA]','Gamma one',&
+                    'Gamma all'
+      230 FORMAT (' ',4(1X,A4),2(2X,A9),2(4X,A9))
+      WRITE(of,*) '---------------------------------------------------------------------'
 
 
       WRITE(specfile, '(A4,2(I1,A1),A4,I1)') 'ICD_', INT(2*J_A), '_', INT(2*J_Ap)&
@@ -109,7 +130,6 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 ! Test whether this channel makes sense at all
       channel_sense_all:IF (E_in - E_fin1 - E_fin2 > 0) THEN
   
-         WRITE(of,*) 'Processing channel ', ichannel
 
 ! Each and every pair.
          DO idist=1,no_dist
@@ -138,19 +158,19 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
                CASE DEFAULT
                  B_MAMAp = 0
              END SELECT
-             WRITE(of,*) 'B_MAMAp= ', B_MAMAp
+!             WRITE(of,*) 'B_MAMAp= ', B_MAMAp
 
              wigner   = eval_wigner3j(J_Ap,1.0,J_A,-M_Ap,M_Ap-M_A,M_A)
-             WRITE(of,*) 'Wigner3j symbol: ', wigner
+!             WRITE(of,*) 'Wigner3j symbol: ', wigner
 
 
 ! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist
             IF (E_sec >= 0.0) THEN
-              WRITE(of,*) 'E_sec= ', E_sec
+!              WRITE(of,*) 'E_sec= ', E_sec
               gamma_b = 2*pi/R_bohr**6 * B_MAMAp**2 * wigner**2 *(2*J_A+1)&
                       & *3*c_au**4 *sigma_au/(16*pi**2 * omega_vp**4 * tau_au) * hartree_to_ev&
                       & / number_of_in !Normalize to one ionization
-              WRITE(of,*) 'Gamma beta = ', gamma_b
+!              WRITE(of,*) 'Gamma beta = ', gamma_b
               gamma_b_pairs = neq_pairs * gamma_b
               gamma_b_all_M = gamma_b_all_M + gamma_b_pairs
     
@@ -158,6 +178,10 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
           END DO all_M_Ap
           
 !Write result to specfile
+          WRITE(of,240) INT(2*J_A), INT(2*M_A), INT(2*J_Ap),&
+                        INT(2*j_Bp), INT(neq_pairs), R_angstrom,&
+                        gamma_b, gamma_b_pairs
+          240 FORMAT (' ',4(1X,I4),4X,I5,6X,F7.3,4X,2(ES9.3,4X))
           WRITE(ICD_outf,141) E_sec, gamma_b_all_M
           141 FORMAT (' ',F12.4,ES15.5)
 
@@ -183,10 +207,10 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
         CASE DEFAULT
           B_MAMAp = 0
       END SELECT
-      WRITE(of,*) 'B_MAMAp= ', B_MAMAp
+!      WRITE(of,*) 'B_MAMAp= ', B_MAMAp
 
       wigner   = eval_wigner3j(J_Ap,1.0,J_A,-M_Ap,M_Ap-M_A,M_A)
-      WRITE(of,*) 'Wigner3j symbol: ', wigner
+!      WRITE(of,*) 'Wigner3j symbol: ', wigner
 
 ! Open the specfile for output
       IF (INT(M_Ap) >= 0) THEN
@@ -203,7 +227,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 ! Test whether this channel makes sense at all
       channel_sense:IF (E_in - E_fin1 - E_fin2 > 0) THEN
   
-        WRITE(of,*) 'Processing channel ', ichannel
+        WRITE(of,*) 'Processing ICD channel ', ichannel
 
         DO idist=1,no_dist
 
@@ -217,11 +241,11 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 
 ! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist
           IF (E_sec >= 0.0) THEN
-            WRITE(of,*) 'E_sec= ', E_sec
+!            WRITE(of,*) 'E_sec= ', E_sec
             gamma_b = 2*pi/R_bohr**6 * B_MAMAp**2 * wigner**2 *(2*J_A+1)&
                     & *3*c_au**4 *sigma_au/(16*pi**2 * omega_vp**4 * tau_au) * hartree_to_ev&
                     & / number_of_in !Normalize to one ionization
-            WRITE(of,*) 'Gamma beta = ', gamma_b
+!            WRITE(of,*) 'Gamma beta = ', gamma_b
             gamma_b_pairs = neq_pairs * gamma_b
             gamma_b_all_pairs = gamma_b_all_pairs + gamma_b_pairs
 
