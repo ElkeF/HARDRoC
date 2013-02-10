@@ -97,11 +97,14 @@ FUNCTION eval_com2(xyz1,xyz2)
 ! Temporary variables
   CHARACTER(len=2), DIMENSION(2) :: atom_types
   REAL, DIMENSION(2) :: masses
-  REAL :: sum_m=0.0
-  REAL,DIMENSION(1,3) :: sum_m_r=0.0
+  REAL :: sum_m
+  REAL,DIMENSION(1,3) :: sum_m_r
 
 ! Counters
   INTEGER :: i
+
+  sum_m   = 0
+  sum_m_r = 0
 
   atom_types(1) = in_atom_type
   atom_types(2) = fin_atom_type1
