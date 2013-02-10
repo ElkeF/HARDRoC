@@ -41,6 +41,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
   REAL :: gamma_b !Decay rate of channel beta
   REAL :: gamma_b_pairs !Decay rate considering all equivalent pairs
   REAL :: gamma_b_all_pairs=0.0 !Sum of all gamma_b_pairs
+  REAL :: gamma_b_all_M
 
 ! Data dictionary: outputfile variables
   CHARACTER(len=15) :: specfile
@@ -92,7 +93,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 ! Special case if M_Ap = 88 calculate gamma for all possible values of M_A'
     calc_them_all:IF (INT(2*M_Ap) == 88) THEN
 
-      gamma_all_M = 0.0
+      gamma_b_all_M = 0.0
 
       WRITE(of,*) 'Processing all values of M_A prime'
 
@@ -108,35 +109,40 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 ! Test whether this channel makes sense at all
       channel_sense_all:IF (E_in - E_fin1 - E_fin2 > 0) THEN
   
-        WRITE(of,*) 'Processing channel ', ichannel
+         WRITE(of,*) 'Processing channel ', ichannel
 
-all_M_Ap:DO iM_Ap=(INT(2*(M_A-1))),(INT(2*(-M_A+1)))
+! Each and every pair.
+         DO idist=1,no_dist
 
-          M_Ap = M_A + iM_Ap
-
-! Set the M_A# dependent variables
-          SELECT CASE (INT(M_Ap - M_A))
-            CASE (-1,1)
-              B_MAMAp = 1
-            CASE (0)
-              B_MAMAp = -2
-            CASE DEFAULT
-              B_MAMAp = 0
-          END SELECT
-          WRITE(of,*) 'B_MAMAp= ', B_MAMAp
-
-          wigner   = eval_wigner3j(J_Ap,1.0,J_A,-M_Ap,M_Ap-M_A,M_A)
-          WRITE(of,*) 'Wigner3j symbol: ', wigner
-
-          DO idist=1,no_dist
+           gamma_b_all_M = 0.0
 
 ! Find values for given pair
-            neq_pairs  = INT(dist_stat(idist,1))
-            R_angstrom = dist_stat(idist,2)
-            R_bohr     = R_angstrom * angstrom_to_bohr
-      
-            E_Coulomb  = 1/R_bohr * hartree_to_ev
-            E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
+           neq_pairs  = INT(dist_stat(idist,1))
+           R_angstrom = dist_stat(idist,2)
+           R_bohr     = R_angstrom * angstrom_to_bohr
+     
+           E_Coulomb  = 1/R_bohr * hartree_to_ev
+           E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
+
+
+           all_M_Ap:DO iM_Ap=(INT(2*(M_A-1))),(INT(2*(-M_A+1)))
+
+             M_Ap = M_A + iM_Ap
+
+! Set the M_A# dependent variables
+             SELECT CASE (INT(M_Ap - M_A))
+               CASE (-1,1)
+                 B_MAMAp = 1
+               CASE (0)
+                 B_MAMAp = -2
+               CASE DEFAULT
+                 B_MAMAp = 0
+             END SELECT
+             WRITE(of,*) 'B_MAMAp= ', B_MAMAp
+
+             wigner   = eval_wigner3j(J_Ap,1.0,J_A,-M_Ap,M_Ap-M_A,M_A)
+             WRITE(of,*) 'Wigner3j symbol: ', wigner
+
 
 ! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist
             IF (E_sec >= 0.0) THEN
@@ -146,18 +152,18 @@ all_M_Ap:DO iM_Ap=(INT(2*(M_A-1))),(INT(2*(-M_A+1)))
                       & / number_of_in !Normalize to one ionization
               WRITE(of,*) 'Gamma beta = ', gamma_b
               gamma_b_pairs = neq_pairs * gamma_b
-              gamma_b_all_pairs = gamma_b_all_pairs + gamma_b_pairs
+              gamma_b_all_M = gamma_b_all_M + gamma_b_pairs
     
             END IF
-          END DO
+          END DO all_M_Ap
           
+!Write result to specfile
+          WRITE(ICD_outf,141) E_sec, gamma_b_all_M
+          141 FORMAT (' ',F12.4,ES15.5)
+
           gamma_all_M = gamma_all_M + gamma_b_pairs
 
-        END DO all_M_Ap
-
-!Write result to specfile
-        WRITE(ICD_outf,141) E_sec, gamma_all_M
-        141 FORMAT (' ',F12.4,ES15.5)
+        END DO 
 
       END IF channel_sense_all
 
