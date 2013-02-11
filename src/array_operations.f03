@@ -29,11 +29,11 @@ SUBROUTINE shrink_rows(inarray,outarray,rows_in,no_out,columns)
   INTEGER :: i,j
 
 ! Nice output
-  WRITE(of,*) ''
-  WRITE(of,300) 'Statistics of Triples'
-  300 FORMAT(' ',15X,A25,20X)
-  WRITE(of,310) 'No', 'Q[angstrom]', 'R[angstrom]', 'theta[rad]', 'R_Coulomb'
-  310 FORMAT (' ',1X,A4,5X,4(A11,2X))
+!  WRITE(of,*) ''
+!  WRITE(of,300) 'Statistics of Triples'
+!  300 FORMAT(' ',15X,A25,20X)
+!  WRITE(of,310) 'No', 'Q[angstrom]', 'R[angstrom]', 'theta[rad]', 'R_Coulomb'
+!  310 FORMAT (' ',1X,A4,5X,4(A11,2X))
 
   temparray = inarray
   row = 0
@@ -77,7 +77,7 @@ SUBROUTINE shrink_rows(inarray,outarray,rows_in,no_out,columns)
       outarray(row,1) = ne_entries
       outarray(row,2:columns+1) = line1(1,1:columns)
 
-      WRITE(of,320)  outarray(row,1:columns+1)
+!      WRITE(of,320)  outarray(row,1:columns+1)
       320 FORMAT (' ',3X,F5.1,4(6X,F7.3))
     END IF
   END DO dorows

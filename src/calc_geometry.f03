@@ -115,7 +115,7 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
 ! is not completely filled
   jacobi3 = 0.0 
 
-  WRITE(of,*) 'Parameters of triples'
+!  WRITE(of,*) 'Parameters of triples'
 
 ! Assign the temp arrays and calculate the geometry parameters
 ! for all possible combinations
@@ -160,7 +160,7 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
           jacobi3(row,4) = Coulomb_dist
 
 
-          WRITE(of,130) (jacobi3(row,l),l=1,4)
+!          WRITE(of,130) (jacobi3(row,l),l=1,4)
           130 FORMAT(' ',4F8.3)
 
           row = row + 1

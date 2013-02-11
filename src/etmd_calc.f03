@@ -92,6 +92,20 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
     sigmarel    = channels(ichannel,12)
 
 
+! Write the characteristics of each channel
+    WRITE(of,*) ''
+    WRITE(of,*) ''
+    WRITE(of,210) 'Processing ETMD channel ', ichannel
+    210 FORMAT (' ',A23,I3)
+    WRITE(of,*) ''
+    WRITE(of,*) 'Characterized by'
+    WRITE(of,220) 'J_A = ',INT(2*J_A),'M_A = ',INT(2*M_A),"J_D = ",INT(2*J_D),&
+                  "M_D = ",INT(2*M_D),"j_B' = ",INT(2*j_Bp)
+    220 FORMAT (' ',5(A7,I2,4X))
+    WRITE(of,*) ''
+    
+
+
 ! Energies used for comparison and calculation
     E_in        = SIP_in + shift_in
     E_fin1      = SIP_fin1 + shift_fin1
@@ -113,6 +127,13 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
       gamma_all_triples = 0.0
 
       WRITE(of,*) 'Processing all values of M_Donor'
+      WRITE(of,*) 'All decay rates are given in eV'
+      WRITE(of,*) ''
+      WRITE(of,230) 'J_A','M_A',"J_A'","j_B'",'no triples','Q [AA]','R [AA]',&
+                    'theta','E_ETMD','Gamma one',&
+                    'Gamma all'
+      230 FORMAT (' ',4(1X,A4),5(2X,A9),2(4X,A9))
+      WRITE(of,*) '-----------------------------------------------------------------------------------------------------'
 
 
       WRITE(specfile, '(A5,2(I1,A1),A4,I1)') 'ETMD_', INT(2*J_A), '_', INT(2*J_D)&
@@ -126,11 +147,11 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 ! Test whether this channel makes sense at all
       channel_sense_all:IF (E_in - E_fin1 - E_fin2 > 0) THEN
 
-        WRITE(of,*) 'Processing channel ', ichannel
-
+        gamma_b_triples = 0
 
 ! Now start for each and every triple
         DO itriple=1,no_ind_triples
+
 
 ! Find values for given triple
           neq_pairs  = INT(triple_parameters(itriple,1))
@@ -144,9 +165,11 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
           E_Coulomb  = 1/R_Coulomb_bohr * hartree_to_ev
           E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
 
-          WRITE(of,*) 'Q_angstrom = ', Q_angstrom
+!          WRITE(of,*) 'Q_angstrom = ', Q_angstrom
             !WRITE(of,*) 'R_angstrom = ', R_angstrom
 !            WRITE(of,*) 'R_bohr = ', R_bohr
+
+          gamma_b_all_M = 0
 
           all_M_Ap:DO iM_D=(INT(2*(M_A-1))),(INT(2*(-M_A+1)))
 
@@ -163,8 +186,8 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
               trdm_z = factor * EXP(-alpha*Q_angstrom) + const
             END IF 
 
-            WRITE(of,*) 'trdm_x = ', trdm_x
-            WRITE(of,*) 'trdm_z = ', trdm_z
+!            WRITE(of,*) 'trdm_x = ', trdm_x
+!            WRITE(of,*) 'trdm_z = ', trdm_z
 !            WRITE(of,*) 'theta = ', theta
 !            WRITE(of,*) 'sin   = ', SIN(theta)
 !            WRITE(of,*) 'sin2  = ', SIN(theta)**2
@@ -174,22 +197,31 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 
 ! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist
             IF (E_sec >= 0.0) THEN
-              WRITE(of,*) 'E_sec= ', E_sec
+!              WRITE(of,*) 'E_sec= ', E_sec
               gamma_b = 2*pi/R_bohr**6  & !check
                         *2*(trdm_x**2 * (1+COS(theta)**2) + trdm_z**2 * SIN(theta)**2) &
                         +4*(trdm_x**2 * SIN(theta)**2 + trdm_z**2 * COS(theta)**2) &
                         * c_au *sigma_au/(4*pi**2 * omega_vp) * hartree_to_ev&
                         / number_of_in !Normalize to one ionization
-              WRITE(of,*) 'Gamma beta = ', gamma_b
-              gamma_b_triples = neq_pairs * gamma_b
-              gamma_b_all_M = gamma_b_all_M + gamma_b_triples
-
-!Write result to specfile
-              WRITE(ETMD_outf,141) E_sec, gamma_b_triples
-              141 FORMAT (' ',F12.4,ES15.5)
+!              WRITE(of,*) 'Gamma beta = ', gamma_b
+!              gamma_b_triples = neq_pairs * gamma_b
+              gamma_b_all_M = gamma_b_all_M + gamma_b
 
             END IF
           END DO all_M_Ap
+          
+          gamma_b_triples = neq_pairs * gamma_b_all_M
+
+!Write result to output file
+          WRITE(of,240) INT(2*J_A), INT(2*M_A), INT(2*J_D),&
+                        INT(2*j_Bp), INT(neq_pairs), Q_angstrom, R_angstrom,&
+                        theta, E_sec, gamma_b_all_M, gamma_b_triples
+          240 FORMAT (' ',4(1X,I4),4X,I5,6X,4(F7.3,4X),2(ES9.3,4X))
+
+!Write result to specfile
+          WRITE(ETMD_outf,141) E_sec, gamma_b_all_M
+          141 FORMAT (' ',F12.4,ES15.5)
+
 
           gamma_all_triples = gamma_all_triples + gamma_b_all_M
 
@@ -203,6 +235,14 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
     ELSE calc_them_all
 
       WRITE(of,*) 'Processing values of M_D separately'
+      WRITE(of,*) 'All decay rates are given in eV'
+      WRITE(of,*) ''
+      WRITE(of,430) 'J_A','M_A',"J_A'","M_A'","j_B'",'no triples','Q [AA]','R [AA]',&
+                    'theta','E_ETMD','Gamma one',&
+                    'Gamma all'
+      430 FORMAT (' ',5(1X,A4),5(2X,A9),2(4X,A9))
+      WRITE(of,*) '-----------------------------------------------------------------------------------------------------'
+
 
 
 ! Open the specfile for output
@@ -220,7 +260,6 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 ! Test whether this channel makes sense at all
       channel_sense:IF (E_in - E_fin1 - E_fin2 > 0) THEN
 
-        WRITE(of,*) 'Processing channel ', ichannel
 
         DO itriple=1,no_ind_triples
 
@@ -248,20 +287,27 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
             trdm_z = factor * EXP(-alpha*Q_angstrom) + const
           END IF 
 
-          WRITE(of,*) 'trdm_x', trdm_x
-          WRITE(of,*) 'trdm_z', trdm_z
+!          WRITE(of,*) 'trdm_x', trdm_x
+!          WRITE(of,*) 'trdm_z', trdm_z
 
 ! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist
           IF (E_sec >= 0.0) THEN
-            WRITE(of,*) 'E_sec= ', E_sec
+!            WRITE(of,*) 'E_sec= ', E_sec
               gamma_b = 2*pi/R_bohr**6  & !check
                         *2*(trdm_x**2 * (1+COS(theta)**2) + trdm_z**2 * SIN(theta)**2) &
                         +4*(trdm_x**2 * SIN(theta)**2 + trdm_z**2 * COS(theta)**2) &
                         * c_au *sigma_au/(4*pi**2 * omega_vp) * hartree_to_ev&
                         / number_of_in !Normalize to one ionization
-              WRITE(of,*) 'Gamma beta = ', gamma_b
+!              WRITE(of,*) 'Gamma beta = ', gamma_b
               gamma_b_triples = neq_pairs * gamma_b
               gamma_b_all_triples = gamma_b_all_triples + gamma_b_triples
+
+
+!Write result to output file
+          WRITE(of,440) INT(2*J_A), INT(2*M_A), INT(2*J_D), INT(2*M_D),&
+                        INT(2*j_Bp), INT(neq_pairs), Q_angstrom, R_angstrom,&
+                        theta, E_sec, gamma_b, gamma_b_triples
+          440 FORMAT (' ',5(1X,I4),4X,I5,6X,4(F7.3,4X),2(ES9.3,4X))
 
 !Write result to specfile
             WRITE(ETMD_outf,141) E_sec, gamma_b_triples
