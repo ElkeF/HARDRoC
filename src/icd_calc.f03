@@ -177,11 +177,12 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
             END IF
           END DO all_M_Ap
           
-!Write result to specfile
+!Write result to output file
           WRITE(of,240) INT(2*J_A), INT(2*M_A), INT(2*J_Ap),&
                         INT(2*j_Bp), INT(neq_pairs), R_angstrom,&
                         gamma_b, gamma_b_pairs
           240 FORMAT (' ',4(1X,I4),4X,I5,6X,F7.3,4X,2(ES9.3,4X))
+! Write results to specfile
           WRITE(ICD_outf,141) E_sec, gamma_b_all_M
           141 FORMAT (' ',F12.4,ES15.5)
 
@@ -194,9 +195,18 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
       CLOSE(ICD_outf)
 
 
+
+
+
     ELSE calc_them_all
 
       WRITE(of,*) 'Processing values of M_A prime separately'
+      WRITE(of,*) 'All decay rates are given in eV'
+      WRITE(of,*) ''
+      WRITE(of,410) 'J_A','M_A',"J_A'","M_A'","j_B'",'no pairs','R [AA]','Gamma one',&
+                    'Gamma all'
+      410 FORMAT (' ',5(1X,A4),2(2X,A9),2(4X,A9))
+      WRITE(of,*) '-------------------------------------------------------------------------'
 
 !Set the M_Ap dependent variables
       SELECT CASE (INT(M_Ap - M_A))
@@ -227,7 +237,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 ! Test whether this channel makes sense at all
       channel_sense:IF (E_in - E_fin1 - E_fin2 > 0) THEN
   
-        WRITE(of,*) 'Processing ICD channel ', ichannel
+!        WRITE(of,*) 'Processing ICD channel ', ichannel
 
         DO idist=1,no_dist
 
@@ -248,6 +258,12 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 !            WRITE(of,*) 'Gamma beta = ', gamma_b
             gamma_b_pairs = neq_pairs * gamma_b
             gamma_b_all_pairs = gamma_b_all_pairs + gamma_b_pairs
+
+! Write summary to output file
+          WRITE(of,420) INT(2*J_A), INT(2*M_A), INT(2*J_Ap),INT(2*M_Ap),&
+                        INT(2*j_Bp), INT(neq_pairs), R_angstrom,&
+                        gamma_b, gamma_b_pairs
+          420 FORMAT (' ',5(1X,I4),4X,I5,6X,F7.3,4X,2(ES9.3,4X))
 
 !Write result to specfile
             WRITE(ICD_outf,141) E_sec, gamma_b_pairs
