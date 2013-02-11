@@ -278,7 +278,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 
   END DO each_channel
 
-    WRITE(of,*) 'Sum of all Gammas for this channel and geometry ', gamma_b_all_pairs
+!    WRITE(of,*) 'Sum of all Gammas for this channel and geometry ', gamma_b_all_pairs
 
 END SUBROUTINE calc_icd_gamma
 
