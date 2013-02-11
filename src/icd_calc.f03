@@ -8,6 +8,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 !Modules
   use control
   use channel_char
+  use select_sigma_para
   use physical_constants
   use wigner3j
 
@@ -15,7 +16,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 
 !Data dictionary: arrays
   INTEGER, INTENT(IN) :: no_channels,no_dist,number_of_in
-  REAL, DIMENSION(no_channels,15), INTENT(IN) :: channels
+  REAL, DIMENSION(no_channels,14), INTENT(IN) :: channels
   REAL, DIMENSION(no_dist,2) :: dist_stat
 
 ! Data dictionary: distances and number of equivalent pairs
@@ -29,6 +30,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
   REAL :: tau !Radiative lifetime of the channel
   REAL :: tau_au !in atomic units
   REAL :: omega_vp !energy of the virtual photon transferred
+  REAL :: omega_vp_ev
   REAL :: sigma ! ionization cross section
   REAL :: sigma_au !in atomic units
 
@@ -46,6 +48,9 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 ! Data dictionary: outputfile variables
   CHARACTER(len=15) :: specfile
   INTEGER :: ierror=0
+
+! Data dictionary: fit parameters for ionization cross section
+  REAL :: quad,lin,const,oneover
 
 ! Special for all variables
   INTEGER :: iM_Ap !counter for loop over all M_A'
@@ -70,8 +75,9 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
     j_Bp        = channels(ichannel,11) / 2.0
     SIP_fin2    = channels(ichannel,12)
     shift_fin2  = channels(ichannel,13)
-    sigmaabs    = channels(ichannel,14)
-    sigmarel    = channels(ichannel,15)
+!    sigmaabs    = channels(ichannel,14)
+    sigmarel    = channels(ichannel,14)
+
 
 
 ! Write the characteristics of each channel
@@ -87,20 +93,23 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
     WRITE(of,*) ''
     
   
+
+! Energies used for comparison and calculation
+    E_in        = SIP_in + shift_in
+    E_fin1      = SIP_fin1 + shift_fin1
+    E_fin2      = SIP_fin2 + shift_fin2
+    omega_vp_ev = E_in - E_fin1
+    omega_vp    = (E_in - E_fin1) * ev_to_hartree
+
+!Determine the ionization cross section
+    CALL select_sigma_fit_para(quad,lin,const,oneover)
+    sigmaabs = quad*omega_vp_ev**2 + lin*omega_vp_ev + const + oneover/omega_vp_ev
+    sigma     = sigmaabs / (1 + 1/sigmarel)
+    sigma_au  = sigma * megabarn_to_sqmeter * meter_to_bohr**2
+
     tau      = tottau/(1 + 1/taurel)
     tau_au   = tau * second_to_atu
 !    WRITE(of,*) 'tau_au= ', tau_au
-    sigma    = sigmaabs / (1 + 1/sigmarel)
-    sigma_au = sigma * megabarn_to_sqmeter * meter_to_bohr**2
-!    WRITE(of,*) 'sigma_au = ', sigma_au
-
-! Energies used for comparison and calculation
-    E_in     = SIP_in + shift_in
-    E_fin1   = SIP_fin1 + shift_fin1
-    E_fin2   = SIP_fin2 + shift_fin2
-    omega_vp = (E_in - E_fin1) * ev_to_hartree
-
-
 
 
 
