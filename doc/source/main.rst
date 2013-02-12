@@ -6,12 +6,12 @@
 Welcome to HARDRoC's documentation!
 ===================================
 
-Contents:
 
 .. toctree::
    :maxdepth: 2
-   installation/first_steps.rst
-   
+   first_steps/installation.rst
+   first_steps/usage.rst
+     
 
 
 
