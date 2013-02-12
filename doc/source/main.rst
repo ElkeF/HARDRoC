@@ -5,6 +5,11 @@
 
 Welcome to HARDRoC's documentation!
 ===================================
+HARDRoC -- Hunting Asymptotic Relativistic Decay Rates of Clusters -- is a program
+to calculate decay widths of electronic decay processes such as ICD and
+ETMD3 based on a structure, which has to be entered, and experimental parameters.
+
+The equations used were derived in J. Chem. Phys. 138, 014305 (2013).
 
 
 First Steps
