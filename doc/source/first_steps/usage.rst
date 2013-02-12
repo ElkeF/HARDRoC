@@ -24,7 +24,8 @@ HARDRoC requires four input files::
   with their parameters.
 
 
-**Important**: All four files have to be given to the executable. Even
-if no ICD calculation is performed, some file has to be given to the programme.
-This file is allowed to contain anything and won't be processed if not
-specified in the *control file*, but has to be present.
+**Important**: The names of all four files have to be given to the executable.
+Even if no ICD calculation is performed, some combination of letters has to be
+given to the programme.
+If the calculation of e.g. ICD is not requested for in the *control file*, nothing
+will happen.
