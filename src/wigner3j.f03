@@ -27,6 +27,8 @@ REAL FUNCTION eval_wigner3j(j1,j2,j3,m1,m2,m3)
  INTEGER :: k,kmax !counter
  REAL :: l !real of k
 
+ sum_nenner= 0 
+
 ! Change input of 3j symbol to m1m, which will be used
 ! for the evaluation of the 3j symbol
  m1m = -m1
