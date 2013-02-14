@@ -199,7 +199,7 @@ SUBROUTINE read_icd_channels(filename,channels,no_channels)
   INTEGER :: line = 0
   INTEGER :: input ! counter for input parameters
   INTEGER, INTENT(IN) :: no_channels
-  REAL, DIMENSION(no_channels,15), INTENT(OUT) :: channels
+  REAL, DIMENSION(no_channels,14), INTENT(OUT) :: channels
 
   OPEN(fh, FILE=filename, STATUS='OLD', ACTION='READ', IOSTAT=ierror)  
 !  WRITE(*,*) 'file opening: ', ierror
@@ -218,7 +218,7 @@ SUBROUTINE read_icd_channels(filename,channels,no_channels)
       ELSE
         line = line + 1
 !        WRITE(*,*) 'line: ', line
-        READ(buffer, *, IOSTAT=ierror) (channels(line,input), input=1,15)
+        READ(buffer, *, IOSTAT=ierror) (channels(line,input), input=1,14)
 !        WRITE(*,*) 'Channel ', (channels(line,input), input=1,15)
       END IF
     END IF
