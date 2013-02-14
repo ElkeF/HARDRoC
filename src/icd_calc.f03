@@ -26,6 +26,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
   
 ! Data dictionary: actual variables in calculation in correct units
   REAL :: wigner !will hold the alue of the wigner3j symbol
+  REAL :: one = 1.0! for wigner
   INTEGER :: B_MAMAp !value of B depending on M_Ap-M_A
   REAL :: tau !Radiative lifetime of the channel
   REAL :: tau_au !in atomic units
@@ -42,7 +43,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
   REAL :: E_sec !Secondary electron produced in the ICD/ETMD process
   REAL :: gamma_b !Decay rate of channel beta
   REAL :: gamma_b_pairs !Decay rate considering all equivalent pairs
-  REAL :: gamma_b_all_pairs=0.0 !Sum of all gamma_b_pairs
+  REAL :: gamma_b_all_pairs !Sum of all gamma_b_pairs
   REAL :: gamma_b_all_M
 
 ! Data dictionary: outputfile variables
@@ -54,9 +55,12 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 
 ! Special for all variables
   INTEGER :: iM_Ap !counter for loop over all M_A'
-  REAL :: gamma_all_M !will hold the result for all M_A' values of one distance
+  REAL :: gamma_all !will hold the result for all M_A' values of one distance
+
 
   each_channel:DO ichannel=1,no_channels
+
+    gamma_all = 0.0
 
 
 ! Assign channel parameters to values in module channel_char
@@ -116,7 +120,6 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 ! Special case if M_Ap = 88 calculate gamma for all possible values of M_A'
     calc_them_all:IF (INT(2*M_Ap) == 88) THEN
 
-      gamma_b_all_M = 0.0
 
       WRITE(of,*) 'Processing all values of M_A prime'
 !      WRITE(of,*) ''
@@ -143,7 +146,8 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 ! Each and every pair.
          DO idist=1,no_dist
 
-           gamma_b_all_M = 0.0
+           gamma_b_all_M     = 0.0
+           gamma_b_all_pairs = 0.0
 
 ! Find values for given pair
            neq_pairs  = INT(dist_stat(idist,1))
@@ -169,7 +173,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
              END SELECT
 !             WRITE(of,*) 'B_MAMAp= ', B_MAMAp
 
-             wigner   = eval_wigner3j(J_Ap,1.0,J_A,-M_Ap,M_Ap-M_A,M_A)
+             wigner   = eval_wigner3j(J_Ap,one,J_A,-M_Ap,M_Ap-M_A,M_A)
 !             WRITE(of,*) 'Wigner3j symbol: ', wigner
 
 
@@ -180,24 +184,29 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
                       & *3*c_au**4 *sigma_au/(16*pi**2 * omega_vp**4 * tau_au) * hartree_to_ev&
                       & / number_of_in !Normalize to one ionization
 !              WRITE(of,*) 'Gamma beta = ', gamma_b
-              gamma_b_pairs = neq_pairs * gamma_b
-              gamma_b_all_M = gamma_b_all_M + gamma_b_pairs
+              gamma_b_all_M = gamma_b_all_M + gamma_b
     
             END IF
           END DO all_M_Ap
+
+          gamma_b_pairs = neq_pairs * gamma_b_all_M
           
 !Write result to output file
           WRITE(of,240) INT(2*J_A), INT(2*M_A), INT(2*J_Ap),&
                         INT(2*j_Bp), INT(neq_pairs), R_angstrom,&
-                        gamma_b, gamma_b_pairs
+                        gamma_b_all_M, gamma_b_pairs
           240 FORMAT (' ',4(1X,I4),4X,I5,6X,F7.3,4X,2(ES9.3,4X))
 ! Write results to specfile
           WRITE(ICD_outf,141) E_sec, gamma_b_all_M
           141 FORMAT (' ',F12.4,ES15.5)
 
-          gamma_all_M = gamma_all_M + gamma_b_pairs
+          gamma_all = gamma_all + gamma_b_pairs
 
         END DO 
+
+        WRITE(of,*) '---------------------------------------------------------------------'
+        WRITE(of,250) gamma_all
+        250 FORMAT (' ',53X,ES15.3)
 
       END IF channel_sense_all
 
@@ -228,8 +237,8 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
       END SELECT
 !      WRITE(of,*) 'B_MAMAp= ', B_MAMAp
 
-      wigner   = eval_wigner3j(J_Ap,1.0,J_A,-M_Ap,M_Ap-M_A,M_A)
-!      WRITE(of,*) 'Wigner3j symbol: ', wigner
+      wigner   = eval_wigner3j(J_Ap,one,J_A,-M_Ap,M_Ap-M_A,M_A)
+      WRITE(of,*) 'Wigner3j symbol: ', wigner
 
 ! Open the specfile for output
       IF (INT(M_Ap) >= 0) THEN
@@ -253,6 +262,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 ! Find values for given pair
           neq_pairs  = INT(dist_stat(idist,1))
           R_angstrom = dist_stat(idist,2)
+!          WRITE(of,*) 'R_ang = ', R_angstrom
           R_bohr     = R_angstrom * angstrom_to_bohr
     
           E_Coulomb  = 1/R_bohr * hartree_to_ev
@@ -269,16 +279,21 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
             gamma_b_all_pairs = gamma_b_all_pairs + gamma_b_pairs
 
 ! Write summary to output file
-          WRITE(of,420) INT(2*J_A), INT(2*M_A), INT(2*J_Ap),INT(2*M_Ap),&
-                        INT(2*j_Bp), INT(neq_pairs), R_angstrom,&
-                        gamma_b, gamma_b_pairs
-          420 FORMAT (' ',5(1X,I4),4X,I5,6X,F7.3,4X,2(ES9.3,4X))
+            WRITE(of,420) INT(2*J_A), INT(2*M_A), INT(2*J_Ap),INT(2*M_Ap),&
+                          INT(2*j_Bp), INT(neq_pairs), R_angstrom,&
+                          gamma_b, gamma_b_pairs
+            420 FORMAT (' ',5(1X,I4),4X,I5,6X,F7.3,4X,2(ES9.3,4X))
 
 !Write result to specfile
             WRITE(ICD_outf,141) E_sec, gamma_b_pairs
 !            141 FORMAT (' ',F12.4,ES15.5) is already defined in all
           END IF
         END DO
+
+      WRITE(of,*) '-------------------------------------------------------------------------'
+      WRITE(of,430) gamma_b_all_pairs
+      430 FORMAT (' ',64X,ES9.3)
+
       END IF channel_sense
 
       CLOSE(ICD_outf)
@@ -288,6 +303,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
   END DO each_channel
 
 !    WRITE(of,*) 'Sum of all Gammas for this channel and geometry ', gamma_b_all_pairs
+
 
 END SUBROUTINE calc_icd_gamma
 
