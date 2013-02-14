@@ -56,15 +56,16 @@ CALL get_command_argument(2, xyz_file)
 CALL get_command_argument(3, icd_channel_file)
 CALL get_command_argument(4, etmd_channel_file)
 
-! Test the correct filename
-  WRITE(*,*) 'icd_file: ', icd_channel_file
-  WRITE(*,*) 'etmd_file: ', etmd_channel_file
-
 
 !Set name of the outputfile
 WRITE(nmout,*) TRIM(xyz_file)//'.out'
 
 OPEN(of, FILE=TRIM(ADJUSTL(nmout)), STATUS='UNKNOWN', ACTION='WRITE', IOSTAT=ierror)
+
+! Test the correct filename
+WRITE(of,*) 'icd_file: ', icd_channel_file
+WRITE(of,*) 'etmd_file: ', etmd_channel_file
+
 
 ! Call a subroutine to parse the control file
 CALL read_control_file(ctrl_file)
@@ -97,8 +98,15 @@ CALL read_xyz_file(xyz_file,incoord,fin1coord,fin2coord,&
 ! and internal coordinates of the pairs and triples
 pairs:IF (do_pairs) THEN
 
+  WRITE(of,*) ''
+  WRITE(of,*) ''
+  WRITE(of,*) '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
+  WRITE(of,*) '%%%%%%%%%%%%%%%%% ICD %%%%%%%%%%%%%%%%%%%'
+  WRITE(of,*) '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
+  WRITE(of,*) ''
+
   no_channels = len_file(icd_channel_file)
-  WRITE(of,*) 'No channels= ', no_channels
+  WRITE(of,*) 'No ICD channels= ', no_channels
 
   ! Allocate the memory for the channels array
   ALLOCATE(channels(no_channels,15))
@@ -119,8 +127,8 @@ pairs:IF (do_pairs) THEN
   ALLOCATE(dist_stat(no_dist,2))
   CALL create_dist_stat(distances,dist_stat,no_pairs,no_dist)
 
-  WRITE(of,121) dist_stat
-  121 FORMAT (' ',F5.1,F8.3)
+!  WRITE(of,121) dist_stat
+!  121 FORMAT (' ',F5.1,F8.3)
 
   DEALLOCATE(distances)
 
@@ -134,6 +142,13 @@ END IF pairs
 
 triples:IF (do_triples) THEN
   
+  WRITE(of,*) ''
+  WRITE(of,*) ''
+  WRITE(of,*) '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
+  WRITE(of,*) '%%%%%%%%%%%%%%%%% ETMD %%%%%%%%%%%%%%%%%%%'
+  WRITE(of,*) '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%'
+  WRITE(of,*) ''
+
   no_channels = len_file(etmd_channel_file)
   WRITE(of,*) 'Number of ETMD channels', no_channels
 
@@ -152,8 +167,8 @@ triples:IF (do_triples) THEN
 ! Determine the number of independent entries in the array jacobi3
   no_ind_triples = diff_rows(jacobi3,no_triples,4)
   
-  WRITE(*,*) 'Number of triples: ', no_triples
-  WRITE(*,*) 'Number of independent triples: ', no_ind_triples
+  WRITE(of,*) 'Number of triples: ', no_triples
+  WRITE(of,*) 'Number of different triples: ', no_ind_triples
 
 ! Allocate the array of the statistical triple parameters
   ALLOCATE(triple_parameters(no_ind_triples,5))

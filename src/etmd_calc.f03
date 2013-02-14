@@ -72,7 +72,6 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
   CHARACTER(len=15) :: specfile
   INTEGER :: ierror=0
 
-
   each_channel:DO ichannel=1,no_channels
 
   ! Assign channel parameters to values in module channel_char
@@ -126,15 +125,6 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 
       gamma_all_triples = 0.0
 
-      WRITE(of,*) 'Processing all values of M_Donor'
-      WRITE(of,*) 'All decay rates are given in eV'
-      WRITE(of,*) ''
-      WRITE(of,230) 'J_A','M_A',"J_A'","j_B'",'no triples','Q [AA]','R [AA]',&
-                    'theta','E_ETMD','Gamma one',&
-                    'Gamma all'
-      230 FORMAT (' ',4(1X,A4),5(2X,A9),2(4X,A9))
-      WRITE(of,*) '-----------------------------------------------------------------------------------------------------'
-
 
       WRITE(specfile, '(A5,2(I1,A1),A4,I1)') 'ETMD_', INT(2*J_A), '_', INT(2*J_D)&
                                           & ,'_', 'all_', INT(2*j_Bp)
@@ -146,6 +136,15 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 
 ! Test whether this channel makes sense at all
       channel_sense_all:IF (E_in - E_fin1 - E_fin2 > 0) THEN
+
+        WRITE(of,*) 'Processing all values of M_Donor'
+        WRITE(of,*) 'All decay rates are given in eV'
+        WRITE(of,*) ''
+        WRITE(of,230) 'J_A','M_A',"J_A'","j_B'",'no triples','Q [AA]','R [AA]',&
+                      'theta','E_ETMD','Gamma one',&
+                      'Gamma all'
+        230 FORMAT (' ',4(1X,A4),5(2X,A9),2(4X,A9))
+        WRITE(of,*) '-----------------------------------------------------------------------------------------------------'
 
         gamma_b_triples = 0
 
@@ -170,6 +169,7 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 !            WRITE(of,*) 'R_bohr = ', R_bohr
 
           gamma_b_all_M = 0
+          gamma_b_all_triples = 0
 
           all_M_Ap:DO iM_D=(INT(2*(M_A-1))),(INT(2*(-M_A+1)))
 
@@ -199,8 +199,8 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
             IF (E_sec >= 0.0) THEN
 !              WRITE(of,*) 'E_sec= ', E_sec
               gamma_b = 2*pi/R_bohr**6  & !check
-                        *2*(trdm_x**2 * (1+COS(theta)**2) + trdm_z**2 * SIN(theta)**2) &
-                        +4*(trdm_x**2 * SIN(theta)**2 + trdm_z**2 * COS(theta)**2) &
+                        *(2*(trdm_x**2 * (1+COS(theta)**2) + trdm_z**2 * SIN(theta)**2) &
+                        +4*(trdm_x**2 * SIN(theta)**2 + trdm_z**2 * COS(theta)**2)) &
                         * c_au *sigma_au/(4*pi**2 * omega_vp) * hartree_to_ev&
                         / number_of_in !Normalize to one ionization
 !              WRITE(of,*) 'Gamma beta = ', gamma_b
@@ -227,22 +227,19 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 
         END DO
 
+        WRITE(of,*) '-----------------------------------------------------------------------------------------------------'
+        WRITE(of,250) gamma_all_triples
+        250 FORMAT (' ',92X,ES9.3)
+
       END IF channel_sense_all
 
       CLOSE(ETMD_outf)
 
 
+
+! If we only want to calculate a certain value of M_A', then proceed
+! with the following
     ELSE calc_them_all
-
-      WRITE(of,*) 'Processing values of M_D separately'
-      WRITE(of,*) 'All decay rates are given in eV'
-      WRITE(of,*) ''
-      WRITE(of,430) 'J_A','M_A',"J_A'","M_A'","j_B'",'no triples','Q [AA]','R [AA]',&
-                    'theta','E_ETMD','Gamma one',&
-                    'Gamma all'
-      430 FORMAT (' ',5(1X,A4),5(2X,A9),2(4X,A9))
-      WRITE(of,*) '-----------------------------------------------------------------------------------------------------'
-
 
 
 ! Open the specfile for output
@@ -259,6 +256,12 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 
 ! Test whether this channel makes sense at all
       channel_sense:IF (E_in - E_fin1 - E_fin2 > 0) THEN
+
+      WRITE(of,430) 'J_A','M_A',"J_A'","M_A'","j_B'",'no triples','Q [AA]','R [AA]',&
+                    'theta','E_ETMD','Gamma one',&
+                    'Gamma all'
+      430 FORMAT (' ',5(1X,A4),5(2X,A9),2(4X,A9))
+      WRITE(of,*) '----------------------------------------------------------------------------------------------------------'
 
 
         DO itriple=1,no_ind_triples
@@ -289,13 +292,19 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 
 !          WRITE(of,*) 'trdm_x', trdm_x
 !          WRITE(of,*) 'trdm_z', trdm_z
+!          WRITE(of,*) 'sigma_au', sigma_au
+!          WRITE(of,*) 'omega_vp', omega_vp
+!          WRITE(of,*) 'c_au', c_au
+!          WRITE(of,*) 'cos theta', COS(theta)
+!          WRITE(of,*) 'sin theta', SIN(theta)
+  
 
 ! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist
           IF (E_sec >= 0.0) THEN
 !            WRITE(of,*) 'E_sec= ', E_sec
               gamma_b = 2*pi/R_bohr**6  & !check
-                        *2*(trdm_x**2 * (1+COS(theta)**2) + trdm_z**2 * SIN(theta)**2) &
-                        +4*(trdm_x**2 * SIN(theta)**2 + trdm_z**2 * COS(theta)**2) &
+                        *(2*(trdm_x**2 * (1+COS(theta)**2) + trdm_z**2 * SIN(theta)**2) &
+                        +4*(trdm_x**2 * SIN(theta)**2 + trdm_z**2 * COS(theta)**2)) &
                         * c_au *sigma_au/(4*pi**2 * omega_vp) * hartree_to_ev&
                         / number_of_in !Normalize to one ionization
 !              WRITE(of,*) 'Gamma beta = ', gamma_b
@@ -310,10 +319,15 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
           440 FORMAT (' ',5(1X,I4),4X,I5,6X,4(F7.3,4X),2(ES9.3,4X))
 
 !Write result to specfile
-            WRITE(ETMD_outf,141) E_sec, gamma_b_triples
+          WRITE(ETMD_outf,141) E_sec, gamma_b_triples
 !            141 FORMAT (' ',F12.4,ES15.5) is already defined in all
           END IF
         END DO
+
+      WRITE(of,*) '----------------------------------------------------------------------------------------------------------'
+      WRITE(of,450) gamma_b_all_triples
+      450 FORMAT (' ',97X,ES9.3)     
+
       END IF channel_sense
 
       CLOSE(ETMD_outf)

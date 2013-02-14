@@ -16,7 +16,7 @@ INTEGER FUNCTION len_file(filename)
  INTEGER :: line
 
  OPEN(fh, FILE=filename, STATUS='OLD', ACTION='READ', IOSTAT=ierror)
- WRITE(*,*) 'ierror: ', ierror
+! WRITE(*,*) 'ierror: ', ierror
 
  line = 0
 
