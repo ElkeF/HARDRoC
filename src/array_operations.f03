@@ -102,45 +102,49 @@ INTEGER FUNCTION diff_rows(array,rows,columns)
   REAL, DIMENSION(rows,columns), INTENT(IN) :: array
 
 ! Data dictionary: Temporary variables
-  REAL, DIMENSION(rows,columns) :: temparray
+  REAL, DIMENSION(rows,columns) :: indeps
   REAL, DIMENSION(1,columns) :: line1, line2, diff
   REAL :: thresh = 1E-4
   REAL :: norm
 
 ! Data dictionary: Counters
   INTEGER :: i,j
+  INTEGER :: k
 
-  temparray = array
-  diff_rows = 0
+  diff_rows = 1
+  indeps(1:1,1:columns) = array(1:1,1:columns)
 
-  dorows:DO i=1,rows
+  dorows:DO i=2,rows
 
-    line1 = temparray(i:i,1:columns)
+    line1 = array(i:i,1:columns)
 
     IF (norm_row(line1,columns) > thresh) THEN
-      diff_rows = diff_rows + 1 ! we have one more possibility
 
-! Zero out all equivalent entries
-      DO j=i+1,rows
+! Check whether this entry already is in indeps
+      doindeps:DO j=1,diff_rows
       
-        line2 = temparray(j:j,1:columns)
+        k = j
+        line2 = indeps(j:j,1:columns)
+        diff  = line1 - line2
 
-        IF (norm_row(line2,columns) > thresh) THEN
+        IF (norm_row(diff,columns) < thresh) THEN
 
-          diff  = line1-line2
-          norm  = norm_row(diff,columns)
+          EXIT doindeps
 
-          IF (norm < thresh) THEN
-     
-            temparray(j:j,1:columns) = 0.0
-
-          END IF
         END IF
-      END DO
+      END DO doindeps
+
+      IF (k == diff_rows) THEN
+
+        diff_rows = diff_rows + 1
+        indeps(diff_rows:diff_rows,1:columns) = line1
+
+      END IF
+!      WRITE(*,*) 'diffrows = ', diff_rows
     END IF
   END DO dorows
 
-END FUNCTION
+END FUNCTION diff_rows
 
 
 
