@@ -197,7 +197,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
                         gamma_b_all_M, gamma_b_pairs
           240 FORMAT (' ',4(1X,I4),4X,I5,6X,F7.3,4X,2(ES9.3,4X))
 ! Write results to specfile
-          WRITE(ICD_outf,141) E_sec, gamma_b_all_M
+          WRITE(ICD_outf,141) E_sec, gamma_b_pairs
           141 FORMAT (' ',F12.4,ES15.5)
 
           gamma_all = gamma_all + gamma_b_pairs

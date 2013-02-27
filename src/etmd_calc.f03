@@ -219,11 +219,11 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
           240 FORMAT (' ',4(1X,I4),4X,I5,6X,4(F7.3,4X),2(ES9.3,4X))
 
 !Write result to specfile
-          WRITE(ETMD_outf,141) E_sec, gamma_b_all_M
+          WRITE(ETMD_outf,141) E_sec, gamma_b_triples
           141 FORMAT (' ',F12.4,ES15.5)
 
 
-          gamma_all_triples = gamma_all_triples + gamma_b_all_M
+          gamma_all_triples = gamma_all_triples + gamma_b_triples
 
         END DO
 
