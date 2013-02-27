@@ -139,7 +139,6 @@ pairs:IF (do_pairs) THEN
 END IF pairs
 
 
-
 triples:IF (do_triples) THEN
   
   WRITE(of,*) ''
@@ -164,9 +163,11 @@ triples:IF (do_triples) THEN
   CALL calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
                   &,number_of_fin2,number_of_fin2,no_triples)
 
+  PAUSE
+
 ! Determine the number of independent entries in the array jacobi3
   no_ind_triples = diff_rows(jacobi3,no_triples,4)
-  
+
   WRITE(of,*) 'Number of triples: ', no_triples
   WRITE(of,*) 'Number of different triples: ', no_ind_triples
 
