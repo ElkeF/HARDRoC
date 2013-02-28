@@ -2,6 +2,100 @@ MODULE array_operations
 
 CONTAINS
 
+SUBROUTINE less_rows(inarray,outarray,rows_in,no_out,columns)
+! Purpose: to get some statistics on the differnt type of entries
+! and to reduce the number of lines without loosing information
+
+  use control
+  use geometry_fun
+
+  IMPLICIT NONE
+
+! Data dictionary: Input parameters
+  INTEGER, INTENT(IN) :: rows_in, columns
+  REAL, DIMENSION(rows_in,columns), INTENT(IN) :: inarray
+
+! Data dictionary: Output parameters
+  INTEGER, INTENT(OUT) :: no_out
+  REAL, ALLOCATABLE, DIMENSION(:,:), INTENT(OUT) :: outarray
+
+! Data dictionary: Temporary variables
+  INTEGER :: row, ne_entries
+  REAL, DIMENSION(rows_in,columns+1) :: temparray
+  REAL, DIMENSION(1,columns) :: line1, line2, diff
+  REAL :: thresh = 1E-4
+  REAL :: norm
+  INTEGER :: no_rows
+  INTEGER :: ierror = 0
+
+! Data dictionary: Counters
+  INTEGER :: i,j
+  INTEGER :: k
+
+
+! Nice output
+!  WRITE(of,*) ''
+!  WRITE(of,300) 'Statistics of Triples'
+!  300 FORMAT(' ',15X,A25,20X)
+!  WRITE(of,310) 'No', 'Q[angstrom]', 'R[angstrom]', 'theta[rad]', 'R_Coulomb'
+!  310 FORMAT (' ',1X,A4,5X,4(A11,2X))
+
+  temparray(1,1) = 1
+  temparray(1:1,2:columns+1) = inarray(1:1,1:columns)
+  no_rows = 1
+!  WRITE(*,*) 'temparray', temparray(1,1:columns+1)
+
+  dorows:DO i=2,rows_in
+
+    line1 = inarray(i:i,1:columns)
+
+    IF (norm_row(line1,columns) > thresh) THEN
+!      WRITE(*,*) line1
+
+! Check whether this entry is already in temparray
+      DO j=1,no_rows
+      
+        line2 = temparray(j:j,2:columns+1)
+        diff  = line1 - line2
+        !WRITE(*,*) diff
+
+        IF (norm_row(diff,columns) < thresh) THEN
+          temparray(j,1) = temparray(j,1) + 1
+          !WRITE(*,*) temparray(j,1)
+          EXIT
+        END IF
+        k = j
+      END DO
+
+      IF (k == no_rows) THEN
+
+        no_rows = no_rows+1
+        temparray(no_rows,1) = 1
+        temparray(no_rows:no_rows,2:columns+1) = line1
+        !WRITE(*,*) temparray(no_rows,1:columns+1)
+
+      END IF
+    END IF
+  END DO dorows
+
+  ALLOCATE(outarray(no_rows,columns+1), STAT = ierror)
+  WRITE(*,*) 'ierror = ', ierror
+
+  outarray(1:no_rows,1:columns+1) = temparray(1:no_rows,1:columns+1)
+! Store result in outarray
+!  WRITE(*,*) outarray(20,1:columns+1)
+  WRITE(*,*) 'Number of different rows: ', no_rows
+  no_out = no_rows
+
+!  WRITE(*,320)  outarray(row,1:columns+1)
+  320 FORMAT (' ',3X,F5.1,4(6X,F7.3))
+
+ 
+
+END SUBROUTINE less_rows
+
+
+
 SUBROUTINE shrink_rows(inarray,outarray,rows_in,no_out,columns)
 ! Purpose: to get some statistics on the differnt type of entries
 ! and to reduce the number of lines without loosing information
@@ -85,6 +179,8 @@ SUBROUTINE shrink_rows(inarray,outarray,rows_in,no_out,columns)
  
 
 END SUBROUTINE shrink_rows
+
+
 
 
 
