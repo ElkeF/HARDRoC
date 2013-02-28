@@ -79,12 +79,11 @@ SUBROUTINE less_rows(inarray,outarray,rows_in,no_out,columns)
   END DO dorows
 
   ALLOCATE(outarray(no_rows,columns+1), STAT = ierror)
-  WRITE(*,*) 'ierror = ', ierror
 
   outarray(1:no_rows,1:columns+1) = temparray(1:no_rows,1:columns+1)
 ! Store result in outarray
 !  WRITE(*,*) outarray(20,1:columns+1)
-  WRITE(*,*) 'Number of different rows: ', no_rows
+!  WRITE(*,*) 'Number of different rows: ', no_rows
   no_out = no_rows
 
 !  WRITE(*,320)  outarray(row,1:columns+1)
