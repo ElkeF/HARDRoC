@@ -89,9 +89,11 @@ SUBROUTINE less_rows(inarray,outarray,rows_in,no_out,columns)
 !  WRITE(*,320)  outarray(row,1:columns+1)
   320 FORMAT (' ',3X,F5.1,4(6X,F7.3))
 
- 
 
 END SUBROUTINE less_rows
+
+
+
 
 
 

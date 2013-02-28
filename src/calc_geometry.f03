@@ -110,6 +110,7 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
   REAL :: distance
   REAL :: thresh = 1E-3
   REAL :: R,Q,theta,Coulomb_dist
+  REAL :: argument
 
 ! Very important, otherwise strange entries appear later, when the array
 ! is not completely filled
@@ -140,17 +141,21 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
           a_vec = xyz_in - COM ! checked
           b_vec = xyz_fin2 - COM ! checked
 
-!          WRITE(of,*) 'a_vec: ', a_vec
-!          WRITE(of,*) 'b_vec: ', b_vec
+          argument = scalar_prod_row(a_vec,b_vec,3)/(norm_row(a_vec,3)*norm_row(b_vec,3))
+          argument = ANINT(argument*10000)/10000
 
-!          WRITE(of,*) 'norm a_vec: ', norm_row(a_vec,3) !checked
-!          WRITE(of,*) 'norm b_vec: ', norm_row(b_vec,3) !checked
-!          WRITE(of,*) 'Scalar product a_vec,b_vec: ', scalar_prod_row(a_vec,b_vec,3)! checked
+!          WRITE(*,*) 'a_vec: ', a_vec
+!          WRITE(*,*) 'b_vec: ', b_vec
+
+!          WRITE(*,*) 'norm a_vec: ', norm_row(a_vec,3) !checked
+!          WRITE(*,*) 'norm b_vec: ', norm_row(b_vec,3) !checked
+!          WRITE(*,*) 'Scalar product a_vec,b_vec: ', scalar_prod_row(a_vec,b_vec,3)! checked
+!          WRITE(*,*) 'argument', argument
 
 
           Q = dist(xyz_in,xyz_fin1)
           R = dist(COM,xyz_fin2)
-          theta = ACOS(scalar_prod_row(a_vec,b_vec,3)/(norm_row(a_vec,3)*norm_row(b_vec,3)))
+          theta = ACOS(argument)
           Coulomb_dist = dist(xyz_fin1,xyz_fin2)
 
 
@@ -160,7 +165,7 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
           jacobi3(row,4) = Coulomb_dist
 
 
-!          WRITE(of,130) (jacobi3(row,l),l=1,4)
+!          WRITE(*,130) (jacobi3(row,l),l=1,4)
           130 FORMAT(' ',4F8.3)
 
           row = row + 1
