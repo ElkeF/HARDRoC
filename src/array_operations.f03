@@ -119,10 +119,9 @@ INTEGER FUNCTION diff_rows(array,rows,columns)
     line1 = array(i:i,1:columns)
 
     IF (norm_row(line1,columns) > thresh) THEN
-
 ! Check whether this entry already is in indeps
       doindeps:DO j=1,diff_rows
-      
+
         k = j
         line2 = indeps(j:j,1:columns)
         diff  = line1 - line2
@@ -142,6 +141,7 @@ INTEGER FUNCTION diff_rows(array,rows,columns)
       END IF
 !      WRITE(*,*) 'diffrows = ', diff_rows
     END IF
+
   END DO dorows
 
 END FUNCTION diff_rows
