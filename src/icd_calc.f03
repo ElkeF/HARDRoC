@@ -205,8 +205,8 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
         END DO 
 
         WRITE(of,*) '---------------------------------------------------------------------'
-        WRITE(of,250) gamma_all
-        250 FORMAT (' ',53X,ES15.3)
+        WRITE(of,250) 'Sum', gamma_all
+        250 FORMAT (' ',A3,50X,ES15.3)
 
       END IF channel_sense_all
 
@@ -291,8 +291,8 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
         END DO
 
       WRITE(of,*) '-------------------------------------------------------------------------'
-      WRITE(of,430) gamma_b_all_pairs
-      430 FORMAT (' ',64X,ES9.3)
+      WRITE(of,430) 'Sum', gamma_b_all_pairs
+      430 FORMAT (' ',A3,61X,ES9.3)
 
       END IF channel_sense
 

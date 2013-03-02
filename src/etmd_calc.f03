@@ -228,8 +228,8 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
         END DO
 
         WRITE(of,*) '-----------------------------------------------------------------------------------------------------'
-        WRITE(of,250) gamma_all_triples
-        250 FORMAT (' ',92X,ES9.3)
+        WRITE(of,250) 'Sum', gamma_all_triples
+        250 FORMAT (' ',A3,89X,ES9.3)
 
       END IF channel_sense_all
 
@@ -325,8 +325,8 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
         END DO
 
       WRITE(of,*) '----------------------------------------------------------------------------------------------------------'
-      WRITE(of,450) gamma_b_all_triples
-      450 FORMAT (' ',97X,ES9.3)     
+      WRITE(of,450) 'Sum', gamma_b_all_triples
+      450 FORMAT (' ',A3,94X,ES9.3)     
 
       END IF channel_sense
 
