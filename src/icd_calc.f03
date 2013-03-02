@@ -45,6 +45,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
   REAL :: gamma_b_pairs !Decay rate considering all equivalent pairs
   REAL :: gamma_b_all_pairs !Sum of all gamma_b_pairs
   REAL :: gamma_b_all_M
+  REAL :: gamma_ICD = 0.0 ! the sum over all ICD gammas requested
 
 ! Data dictionary: outputfile variables
   CHARACTER(len=15) :: specfile
@@ -204,6 +205,9 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 
         END DO 
 
+! Add the sum to the sum over all requested channels
+        gamma_ICD = gamma_ICD + gamma_all
+
         WRITE(of,*) '---------------------------------------------------------------------'
         WRITE(of,250) 'Sum', gamma_all
         250 FORMAT (' ',A3,50X,ES15.3)
@@ -290,9 +294,12 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
           END IF
         END DO
 
-      WRITE(of,*) '-------------------------------------------------------------------------'
-      WRITE(of,430) 'Sum', gamma_b_all_pairs
-      430 FORMAT (' ',A3,61X,ES9.3)
+! Add the sum to the sum over all requested channels
+        gamma_ICD = gamma_ICD + gamma_b_all_pairs
+
+        WRITE(of,*) '-------------------------------------------------------------------------'
+        WRITE(of,430) 'Sum', gamma_b_all_pairs
+        430 FORMAT (' ',A3,61X,ES9.3)
 
       END IF channel_sense
 
@@ -302,7 +309,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 
   END DO each_channel
 
-!    WRITE(of,*) 'Sum of all Gammas for this channel and geometry ', gamma_b_all_pairs
+  WRITE(of,*) 'Sum of ICD Gammas for all requested channels ', gamma_ICD
 
 
 END SUBROUTINE calc_icd_gamma

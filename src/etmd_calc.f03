@@ -66,6 +66,7 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
   REAL :: gamma_b
   REAL :: gamma_b_triples
   REAL :: gamma_b_all_triples
+  REAL :: gamma_ETMD = 0.0 ! Sum over all requested channels
   
 
 ! Data dictionary: outputfile variables
@@ -227,6 +228,9 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 
         END DO
 
+! Sum over all channels
+        gamma_ETMD = gamma_ETMD + gamma_all_triples
+
         WRITE(of,*) '-----------------------------------------------------------------------------------------------------'
         WRITE(of,250) 'Sum', gamma_all_triples
         250 FORMAT (' ',A3,89X,ES9.3)
@@ -324,9 +328,12 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
           END IF
         END DO
 
-      WRITE(of,*) '----------------------------------------------------------------------------------------------------------'
-      WRITE(of,450) 'Sum', gamma_b_all_triples
-      450 FORMAT (' ',A3,94X,ES9.3)     
+!Sum over all requested channels
+        gamma_ETMD = gamma_ETMD + gamma_b_all_triples
+
+        WRITE(of,*) '----------------------------------------------------------------------------------------------------------'
+        WRITE(of,450) 'Sum', gamma_b_all_triples
+        450 FORMAT (' ',A3,94X,ES9.3)     
 
       END IF channel_sense
 
@@ -335,6 +342,8 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
    END IF calc_them_all
 
   END DO each_channel
+
+  WRITE(of,*) 'Sum over all requested ETMD channels ', gamma_ETMD
 
 END SUBROUTINE calc_etmd_gamma
 
