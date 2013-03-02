@@ -144,36 +144,36 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
   
 
 ! Each and every pair.
-         DO idist=1,no_dist
+        DO idist=1,no_dist
 
-           gamma_b_all_M     = 0.0
-           gamma_b_all_pairs = 0.0
+          gamma_b_all_M     = 0.0
+          gamma_b_all_pairs = 0.0
 
 ! Find values for given pair
-           neq_pairs  = INT(dist_stat(idist,1))
-           R_angstrom = dist_stat(idist,2)
-           R_bohr     = R_angstrom * angstrom_to_bohr
-     
-           E_Coulomb  = 1/R_bohr * hartree_to_ev
-           E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
+          neq_pairs  = INT(dist_stat(idist,1))
+          R_angstrom = dist_stat(idist,2)
+          R_bohr     = R_angstrom * angstrom_to_bohr
+    
+          E_Coulomb  = 1/R_bohr * hartree_to_ev
+          E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
 
 
-           all_M_Ap:DO iM_Ap=(INT(2*(M_A-1))),(INT(2*(-M_A+1)))
+          all_M_Ap:DO iM_Ap=(INT(2*(M_A-1))),(INT(2*(-M_A+1)))
 
-             M_Ap = M_A + iM_Ap
+            M_Ap = M_A + iM_Ap
 
 ! Set the M_A# dependent variables
-             SELECT CASE (INT(M_Ap - M_A))
-               CASE (-1,1)
-                 B_MAMAp = 1
-               CASE (0)
-                 B_MAMAp = -2
-               CASE DEFAULT
-                 B_MAMAp = 0
-             END SELECT
+            SELECT CASE (INT(M_Ap - M_A))
+              CASE (-1,1)
+                B_MAMAp = 1
+              CASE (0)
+                B_MAMAp = -2
+              CASE DEFAULT
+                B_MAMAp = 0
+            END SELECT
 !             WRITE(of,*) 'B_MAMAp= ', B_MAMAp
 
-             wigner   = eval_wigner3j(J_Ap,one,J_A,-M_Ap,M_Ap-M_A,M_A)
+            wigner   = eval_wigner3j(J_Ap,one,J_A,-M_Ap,M_Ap-M_A,M_A)
 !             WRITE(of,*) 'Wigner3j symbol: ', wigner
 
 
