@@ -158,17 +158,15 @@ triples:IF (do_triples) THEN
 
   no_triples = number_of_in*number_of_fin1*number_of_fin2
 
-  WRITE(of,*) 'Number of triples: ', no_triples
+  WRITE(of,*) 'Number of possible triples: ', no_triples
 
-!  ALLOCATE(jacobi3(no_triples,4))
-
+! Calculate the triples requested
   CALL calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
                   &,number_of_fin2,number_of_fin2,no_triples)
 
+  WRITE(of,*) 'Number of requested triples: ', no_triples
 
-! Determine the number of independent entries in the array jacobi3
-!  no_ind_triples = diff_rows(jacobi3,no_triples,4)
-
+! Reduce the information to a more compact form
   CALL less_rows(jacobi3,triple_parameters,no_triples,no_ind_triples,4)
   WRITE(of,*) 'Number of different triples: ', no_ind_triples
 

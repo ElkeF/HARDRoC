@@ -343,6 +343,7 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 
   END DO each_channel
 
+  WRITE(of,*)
   WRITE(of,*) 'Sum over all requested ETMD channels ', gamma_ETMD
 
 END SUBROUTINE calc_etmd_gamma
