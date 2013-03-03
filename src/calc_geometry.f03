@@ -94,11 +94,11 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
   IMPLICIT NONE
 
 !Data dictionary: Input coordinates and output
-  INTEGER, INTENT(IN) :: number_of_in,number_of_fin1,number_of_fin2,no_triples
+  INTEGER, INTENT(IN) :: number_of_in,number_of_fin1,number_of_fin2
+  INTEGER, INTENT(INOUT) :: no_triples
   REAL, INTENT(IN), DIMENSION(number_of_in,3) :: incoord
   REAL, INTENT(IN), DIMENSION(number_of_fin1,3) :: fin1coord
   REAL, INTENT(IN), DIMENSION(number_of_fin2,3) :: fin2coord
-  REAL, DIMENSION(no_triples,4) :: jacobi3
 
 ! Data dictionary: counters
   INTEGER :: i,j,k,l,row=1
@@ -111,10 +111,14 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
   REAL :: thresh = 1E-3
   REAL :: R,Q,theta,Coulomb_dist
   REAL :: argument
+  REAL, DIMENSION(no_triples,4) :: temparray
+
+! Data dictionary: Output
+  REAL, ALLOCATABLE, DIMENSION(:,:), INTENT(OUT) :: jacobi3
 
 ! Very important, otherwise strange entries appear later, when the array
 ! is not completely filled
-  jacobi3 = 0.0 
+  temparray = 0.0 
 
 !  WRITE(of,*) 'Parameters of triples'
 
@@ -159,22 +163,30 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
           Coulomb_dist = dist(xyz_fin1,xyz_fin2)
 
 
-          jacobi3(row,1) = Q
-          jacobi3(row,2) = R
-          jacobi3(row,3) = theta
-          jacobi3(row,4) = Coulomb_dist
+          Qselect:IF (Q <= Qmax) THEN
+
+            temparray(row,1) = Q
+            temparray(row,2) = R
+            temparray(row,3) = theta
+            temparray(row,4) = Coulomb_dist
 
 
 !          WRITE(*,130) (jacobi3(row,l),l=1,4)
-          130 FORMAT(' ',4F8.3)
+            130 FORMAT(' ',4F8.3)
 
-          row = row + 1
+            row = row + 1
+
+          END IF Qselect
 
         END IF not_same
       END DO
     END DO
   END DO  
 
+  ALLOCATE(jacobi3(row,4))
+
+  jacobi3(1:row,1:4) = temparray(1:row,1:4)
+  no_triples = row
 
 END SUBROUTINE calc_triples
 

@@ -158,7 +158,9 @@ triples:IF (do_triples) THEN
 
   no_triples = number_of_in*number_of_fin1*number_of_fin2
 
-  ALLOCATE(jacobi3(no_triples,4))
+  WRITE(of,*) 'Number of triples: ', no_triples
+
+!  ALLOCATE(jacobi3(no_triples,4))
 
   CALL calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
                   &,number_of_fin2,number_of_fin2,no_triples)
@@ -167,13 +169,7 @@ triples:IF (do_triples) THEN
 ! Determine the number of independent entries in the array jacobi3
 !  no_ind_triples = diff_rows(jacobi3,no_triples,4)
 
-  WRITE(of,*) 'Number of triples: ', no_triples
-
-! Allocate the array of the statistical triple parameters
-!  ALLOCATE(triple_parameters(no_ind_triples,5))
-
   CALL less_rows(jacobi3,triple_parameters,no_triples,no_ind_triples,4)
-!  CALL shrink_rows(jacobi3,triple_parameters,no_triples,no_ind_triples,4)
   WRITE(of,*) 'Number of different triples: ', no_ind_triples
 
 ! Now we have the much smaller array containing the parameters of the triples
