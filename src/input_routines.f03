@@ -48,6 +48,9 @@ IMPLICIT NONE
         CASE ('atfin2')
            READ(buffer, *, IOSTAT=ierror) fin_atom_type2
            WRITE(of,*) 'Read fin_atom_type2: ', fin_atom_type2
+        CASE ('Qmax')
+           READ(buffer, *, IOSTAT=ierror) Qmax
+           WRITE(of,*) 'Read Qmax: ', Qmax
         CASE default
            WRITE(of,*) 'Skipping invalid label at line', line
         END SELECT
