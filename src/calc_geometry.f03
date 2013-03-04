@@ -136,14 +136,25 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
 !        WRITE(of,*) 'Distance between final ', distance
         not_same:IF (distance > thresh) THEN
 
-          COM = eval_com2(xyz_in,xyz_fin1) !checked
+! COM as reference
+!------------------------------------------------------
+!          COM = eval_com2(xyz_in,xyz_fin1) !checked
+
 !          WRITE(of,*) 'COM= ', COM
 !          WRITE(of,*) 'xyz_in= ', xyz_in
 !          WRITE(of,*) 'xyz_fin1= ', xyz_fin1
 !          WRITE(of,*) 'xyz_fin2= ', xyz_fin2
 
-          a_vec = xyz_in - COM ! checked
-          b_vec = xyz_fin2 - COM ! checked
+!          a_vec = xyz_in - COM ! checked
+!          b_vec = xyz_fin2 - COM ! checked
+!------------------------------------------------------
+
+! in as reference
+!------------------------------------------------------
+          a_vec = xyz_in ! checked
+          b_vec = xyz_fin2 - xyz_in ! checked
+!------------------------------------------------------
+
 
           argument = scalar_prod_row(a_vec,b_vec,3)/(norm_row(a_vec,3)*norm_row(b_vec,3))
           argument = ANINT(argument*10000)/10000
