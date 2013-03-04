@@ -169,7 +169,8 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
 
 
           Q = dist(xyz_in,xyz_fin1)
-          R = dist(COM,xyz_fin2)
+!          R = dist(COM,xyz_fin2)
+          R = dist(xyz_in,xyz_fin2)
           theta = ACOS(argument)
           Coulomb_dist = dist(xyz_fin1,xyz_fin2)
 
