@@ -111,14 +111,13 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
   REAL :: thresh = 1E-3
   REAL :: R,Q,theta,Coulomb_dist
   REAL :: argument
-  REAL, DIMENSION(no_triples,4) :: temparray
+  REAL, ALLOCATABLE, DIMENSION(:,:) :: temparray
 
 ! Data dictionary: Output
   REAL, ALLOCATABLE, DIMENSION(:,:), INTENT(OUT) :: jacobi3
 
-! Very important, otherwise strange entries appear later, when the array
-! is not completely filled
-  temparray = 0.0 
+
+  ALLOCATE(temparray(no_triples,4))
 
 !  WRITE(of,*) 'Parameters of triples'
 
@@ -199,6 +198,7 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
 
   jacobi3(1:row,1:4) = temparray(1:row,1:4)
   no_triples = row
+  DEALLOCATE(temparray)
 
 END SUBROUTINE calc_triples
 

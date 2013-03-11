@@ -164,6 +164,10 @@ triples:IF (do_triples) THEN
   CALL calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
                   &,number_of_fin2,number_of_fin2,no_triples)
 
+  DEALLOCATE(incoord)
+  DEALLOCATE(fin1coord)
+  DEALLOCATE(fin2coord)
+
   WRITE(of,*) 'Number of requested triples: ', no_triples
 
 ! Reduce the information to a more compact form
