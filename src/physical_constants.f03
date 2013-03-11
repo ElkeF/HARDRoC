@@ -35,32 +35,36 @@ REAL,PARAMETER :: second_to_atu = E_h*2*pi/h
 REAL,PARAMETER :: atu_to_second = h/(2*pi*E_h)
 
 CONTAINS
+
 SUBROUTINE write_phys_const()
-  WRITE(*,*) 'Physical constants used in this programme'
-  WRITE(*,131) 'Speed of light', c
+
+  use control
+
+  WRITE(of,*) 'Physical constants used in this programme'
+  WRITE(of,131) 'Speed of light', c
   131 FORMAT(' ',A30,3X,ES20.13)
-  WRITE(*,131) "Planck's constant", h
-  WRITE(*,131) 'Rest mass of the electron', m_e
-  WRITE(*,131) 'Electron charge', e
-  WRITE(*,131) 'Fine structure constant', fs_const
-  WRITE(*,131) 'pi', pi
-  WRITE(*,131) 'Bohr radius', a_0
-  WRITE(*,131) 'Hartree energy', E_h
+  WRITE(of,131) "Planck's constant", h
+  WRITE(of,131) 'Rest mass of the electron', m_e
+  WRITE(of,131) 'Electron charge', e
+  WRITE(of,131) 'Fine structure constant', fs_const
+  WRITE(of,131) 'pi', pi
+  WRITE(of,131) 'Bohr radius', a_0
+  WRITE(of,131) 'Hartree energy', E_h
   
-  WRITE(*,*) ' '
-  WRITE(*,*) 'Conversion factors used in this programme'
-  WRITE(*,131) 'Angstrom to Bohr', angstrom_to_bohr
-  WRITE(*,131) 'Bohr to Angstrom', bohr_to_angstrom
-  WRITE(*,131) 'Megabarn to square meter', megabarn_to_sqmeter
-  WRITE(*,131) 'Second to a.t.u', second_to_atu
-  WRITE(*,131) 'a.t.u. to Second', atu_to_second
-  WRITE(*,131) 'Joule to eV', joule_to_ev
-  WRITE(*,131) 'eV to Joule', ev_to_joule
-  WRITE(*,131) 'Joule to Hartree', joule_to_hartree
-  WRITE(*,131) 'Hartree to Joule', hartree_to_joule
-  WRITE(*,131) 'Hartree to eV', hartree_to_ev
-  WRITE(*,131) 'eV to Hartree', ev_to_hartree
-  WRITE(*,*) ' '
+  WRITE(of,*) ' '
+  WRITE(of,*) 'Conversion factors used in this programme'
+  WRITE(of,131) 'Angstrom to Bohr', angstrom_to_bohr
+  WRITE(of,131) 'Bohr to Angstrom', bohr_to_angstrom
+  WRITE(of,131) 'Megabarn to square meter', megabarn_to_sqmeter
+  WRITE(of,131) 'Second to a.t.u', second_to_atu
+  WRITE(of,131) 'a.t.u. to Second', atu_to_second
+  WRITE(of,131) 'Joule to eV', joule_to_ev
+  WRITE(of,131) 'eV to Joule', ev_to_joule
+  WRITE(of,131) 'Joule to Hartree', joule_to_hartree
+  WRITE(of,131) 'Hartree to Joule', hartree_to_joule
+  WRITE(of,131) 'Hartree to eV', hartree_to_ev
+  WRITE(of,131) 'eV to Hartree', ev_to_hartree
+  WRITE(of,*) ' '
 END SUBROUTINE write_phys_const
 
 END MODULE physical_constants
