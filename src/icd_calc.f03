@@ -109,7 +109,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 !Determine the ionization cross section
     CALL select_sigma_fit_para(quad,lin,const,oneover)
     sigmaabs = quad*omega_vp_ev**2 + lin*omega_vp_ev + const + oneover/omega_vp_ev
-    sigma     = sigmaabs / (1 + 1/sigmarel)
+    sigma     = sigmaabs / (1 + sigmarel)
     sigma_au  = sigma * megabarn_to_sqmeter * meter_to_bohr**2
 
     tau      = tottau/(1 + 1/taurel)
@@ -172,15 +172,17 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
               CASE DEFAULT
                 B_MAMAp = 0
             END SELECT
-!             WRITE(of,*) 'B_MAMAp= ', B_MAMAp
+!             WRITE(of,*) 'B_MAMAp**2 = ', B_MAMAp**2
 
             wigner   = eval_wigner3j(J_Ap,one,J_A,-M_Ap,M_Ap-M_A,M_A)
-!             WRITE(of,*) 'Wigner3j symbol: ', wigner
+!             WRITE(of,*) 'Wigner3j symbol squared: ', wigner**2
 
 
 ! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist
             IF (E_sec >= 0.0) THEN
 !              WRITE(of,*) 'E_sec= ', E_sec
+!              WRITE(of,*) 'omega vp = ', omega_vp
+!              WRITE(of,*) 'S = ', 3*c_au**3/(4*omega_vp**3) * (2*J_A+1)/tau_au
               gamma_b = 2*pi/R_bohr**6 * B_MAMAp**2 * wigner**2 *(2*J_A+1)&
                       & *3*c_au**4 *sigma_au/(16*pi**2 * omega_vp**4 * tau_au) * hartree_to_ev&
                       & / number_of_in !Normalize to one ionization
