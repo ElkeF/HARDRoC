@@ -112,9 +112,12 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
     sigma     = sigmaabs / (1 + sigmarel)
     sigma_au  = sigma * megabarn_to_sqmeter * meter_to_bohr**2
 
-    tau      = tottau/(1 + 1/taurel)
+    tau      = tottau * (1 + 1/taurel)
     tau_au   = tau * second_to_atu
-!    WRITE(of,*) 'tau_au= ', tau_au
+    WRITE(of,*) 'tottau= ', tottau
+    WRITE(of,*) 'taurel= ', taurel
+    WRITE(of,*) 'tau   = ', tau
+    WRITE(of,*) 'tau_au= ', tau_au
 
 
 
