@@ -4,6 +4,27 @@ MODULE sigma_library
 ! f(x) =  quad*x^2 + lin*x + const + oneover/x
 ! Here x is of course the energy of the virtual photon in eV.
 
+! Ne p, combined 3/2 and 1/2
+! Atomic and Nuclear Data Tables ,  (1976)
+  REAL,PARAMETER :: Ne2p_quad    =     0.023484
+  REAL,PARAMETER :: Ne2p_lin     =   -2.3761661
+  REAL,PARAMETER :: Ne2p_const   =    90.936913
+  REAL,PARAMETER :: Ne2p_oneover =  -957.652355
+
+! Ar p, combined 3/2 and 1/2
+! Atomic and Nuclear Data Tables ,  (1976)
+  REAL,PARAMETER :: Ar3p_quad    =     0.076643
+  REAL,PARAMETER :: Ar3p_lin     =    -9.891266
+  REAL,PARAMETER :: Ar3p_const   =   344.970801
+  REAL,PARAMETER :: Ar3p_oneover = -2820.658029
+
+! Kr p, combined 3/2 and 1/2
+! Atomic and Nuclear Data Tables ,  (1976)
+  REAL,PARAMETER :: Kr4p_quad    =     0.614407
+  REAL,PARAMETER :: Kr4p_lin     =   -43.033045
+  REAL,PARAMETER :: Kr4p_const   =   977.917266
+  REAL,PARAMETER :: Kr4p_oneover = -6479.795897
+
 ! Xe p, combined 3/2 and 1/2
 ! Atomic and Nuclear Data Tables 22, 103 (1978)
   REAL,PARAMETER :: Xe5p_quad    =     0.695058
