@@ -111,14 +111,13 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
   REAL :: thresh = 1E-3
   REAL :: R,Q,theta,Coulomb_dist
   REAL :: argument
-  REAL, DIMENSION(no_triples,4) :: temparray
+  REAL, ALLOCATABLE, DIMENSION(:,:) :: temparray
 
 ! Data dictionary: Output
   REAL, ALLOCATABLE, DIMENSION(:,:), INTENT(OUT) :: jacobi3
 
-! Very important, otherwise strange entries appear later, when the array
-! is not completely filled
-  temparray = 0.0 
+
+  ALLOCATE(temparray(no_triples,4))
 
 !  WRITE(of,*) 'Parameters of triples'
 
@@ -136,14 +135,25 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
 !        WRITE(of,*) 'Distance between final ', distance
         not_same:IF (distance > thresh) THEN
 
-          COM = eval_com2(xyz_in,xyz_fin1) !checked
+! COM as reference
+!------------------------------------------------------
+!          COM = eval_com2(xyz_in,xyz_fin1) !checked
+
 !          WRITE(of,*) 'COM= ', COM
 !          WRITE(of,*) 'xyz_in= ', xyz_in
 !          WRITE(of,*) 'xyz_fin1= ', xyz_fin1
 !          WRITE(of,*) 'xyz_fin2= ', xyz_fin2
 
-          a_vec = xyz_in - COM ! checked
-          b_vec = xyz_fin2 - COM ! checked
+!          a_vec = xyz_in - COM ! checked
+!          b_vec = xyz_fin2 - COM ! checked
+!------------------------------------------------------
+
+! in as reference
+!------------------------------------------------------
+          a_vec = xyz_in ! checked
+          b_vec = xyz_fin2 - xyz_in ! checked
+!------------------------------------------------------
+
 
           argument = scalar_prod_row(a_vec,b_vec,3)/(norm_row(a_vec,3)*norm_row(b_vec,3))
           argument = ANINT(argument*10000)/10000
@@ -158,7 +168,8 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
 
 
           Q = dist(xyz_in,xyz_fin1)
-          R = dist(COM,xyz_fin2)
+!          R = dist(COM,xyz_fin2)
+          R = dist(xyz_in,xyz_fin2)
           theta = ACOS(argument)
           Coulomb_dist = dist(xyz_fin1,xyz_fin2)
 
@@ -187,6 +198,7 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
 
   jacobi3(1:row,1:4) = temparray(1:row,1:4)
   no_triples = row
+  DEALLOCATE(temparray)
 
 END SUBROUTINE calc_triples
 

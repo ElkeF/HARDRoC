@@ -14,7 +14,7 @@ use etmd_calc
 use lenfile
 use array_operations
 !use wigner3j
-!use physical_constants
+use physical_constants
 IMPLICIT NONE
 
 !Data dictionary: Parameters for Inputfile reading
@@ -91,7 +91,8 @@ CALL read_xyz_file(xyz_file,incoord,fin1coord,fin2coord,&
 120 FORMAT(' ',3F8.3)
 
 !Display the physical constants used
-!CALL write_phys_const()
+CALL write_phys_const()
+!  WRITE(of,*) 'second to atu = ', second_to_atu
 
 ! At this point the coordinates and the input parameters have been
 ! read into the programme and we can now start to calculate the distances
@@ -163,6 +164,10 @@ triples:IF (do_triples) THEN
 ! Calculate the triples requested
   CALL calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
                   &,number_of_fin2,number_of_fin2,no_triples)
+
+  DEALLOCATE(incoord)
+  DEALLOCATE(fin1coord)
+  DEALLOCATE(fin2coord)
 
   WRITE(of,*) 'Number of requested triples: ', no_triples
 

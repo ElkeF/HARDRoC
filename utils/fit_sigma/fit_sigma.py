@@ -164,7 +164,7 @@ p=[quad,lin,const,oneover]
 #   unpack=True transposes lines in columns, e.g. if each line has an x, y, z
 #               triplet, then x, y, z = numpy.loadtxt will load the data into
 #               x[i], y[i], z[i] instead of xyz[i]
-filename =('../../exppar_lib/sigma/Xe.dat')
+filename =('../../exppar_lib/sigma/Ne.dat')
 data = numpy.loadtxt(filename)
 x_data  = data[:,0]
 y_data  = data[:,1]
