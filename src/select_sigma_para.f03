@@ -18,6 +18,21 @@ SUBROUTINE select_sigma_fit_para(quad,lin,const,oneover)
 
   inatom: SELECT CASE (fin_atom_type2)
   
+    CASE('Ne')
+      quad    = Ne2p_quad
+      lin     = Ne2p_lin
+      const   = Ne2p_const
+      oneover = Ne2p_oneover
+    CASE('Ar')
+      quad    = Ar3p_quad
+      lin     = Ar3p_lin
+      const   = Ar3p_const
+      oneover = Ar3p_oneover
+    CASE('Kr')
+      quad    = Kr4p_quad
+      lin     = Kr4p_lin
+      const   = Kr4p_const
+      oneover = Kr4p_oneover
     CASE('Xe')
       quad    = Xe5p_quad
       lin     = Xe5p_lin
