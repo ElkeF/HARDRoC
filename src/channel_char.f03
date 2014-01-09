@@ -30,5 +30,9 @@ REAL :: sigmarel = 0.0 !relation of sigma, sigma_lowerSIP/sigma_higherSIP
 REAL :: J_D = 8.8 ! Total angular momentum of the donor atom in the e transition
 REAL :: M_D = 8.8 ! Projection of J_D
 
+! Coefficients for fitting procedure
+REAL(8)  :: c_pre = 0.0
+REAL(8)  :: c_exp = 0.0
+REAL(8)  :: c_6   = 0.0
 
 END MODULE
