@@ -36,6 +36,9 @@ IMPLICIT NONE
         CASE ('pairs')
            READ(buffer, *, IOSTAT=ierror) do_pairs
            WRITE(of,*) 'Read do_pairs: ', do_pairs
+        CASE ('fit')
+           READ(buffer, *, IOSTAT=ierror) do_fit
+           WRITE(of,*) 'Read do_fit: ', do_fit
         CASE ('triples')
            READ(buffer, *, IOSTAT=ierror) do_triples
            WRITE(of,*) 'Read do_triples: ', do_triples

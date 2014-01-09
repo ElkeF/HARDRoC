@@ -136,16 +136,28 @@ def poly2_m1(x):
     #   Prefactor of 1/x             : oneover
     return quad()*x**2 + lin()*x + const() + oneover()/x
 
+def gamma(x):
+    # A polynomial a e^(-bx) + c/x^6 + d
+    #   Prefactor of e-func          : alpha
+    #   Exponential variable         : beta
+    #   dipole interaction           : gamma
+    #   Constant                     : delta
+    return alpha()* numpy.exp(0-beta()*x) + 6.204031/x**6 
+    #return alpha()* numpy.exp(0-beta()*x) + gamma()/x**6 
+    #return  gamma()/x**6 
+
 ## Choose function
-func = poly2_m1
+func = gamma
 ## Define the fit parameters, guessing some starting values
 #factor  = Parameter("factor",1)
 #alpha   = Parameter("alpha",0.5)
 #const   = Parameter("const",3)
-quad    = Parameter("quad",1)
-lin     = Parameter("lin",1)
-const   = Parameter("const",1)
-oneover = Parameter("oneover",1)
+alpha   = Parameter("alpha",1)
+beta    = Parameter("beta",1)
+#gamma   = Parameter("gamma",20)
+#quad    = Parameter("quad",1)
+#tetra   = Parameter("tetra",1)
+#octa    = Parameter("octa",1)
 
 # This converges to a negative y_peak if x0=1170, but fits perfectly if x0=1171.
 #   One can't assume that a fit will produce sensible results.
@@ -159,14 +171,15 @@ oneover = Parameter("oneover",1)
 #    print "\nInvalid width parameter name.\n"
     
     
-p=[quad,lin,const,oneover]
+p=[alpha,beta]
+#p=[gamma]
 
 ## Read Data
 #   unpack=True transposes lines in columns, e.g. if each line has an x, y, z
 #               triplet, then x, y, z = numpy.loadtxt will load the data into
 #               x[i], y[i], z[i] instead of xyz[i]
 #filename =('../../exppar_lib/sigma/Ar.dat')
-filename =('Ar.dat')
+filename =('Ne2.dat')
 data = numpy.loadtxt(filename)
 x_data  = data[:,0]
 y_data  = data[:,1]
