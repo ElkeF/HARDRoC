@@ -1,5 +1,6 @@
-pairs F
-triples T
+pairs T
+fit T
+triples F
 atin Ar
 atfin1 Xe
 atfin2 Xe
