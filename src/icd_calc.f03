@@ -84,6 +84,9 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
       c_pre       = channels(ichannel,11)
       c_exp       = channels(ichannel,12)
       c_6         = channels(ichannel,13)
+
+    WRITE(of,*) 'c_pre = ', c_pre, ' c_exp = ', c_exp, ' c_6 = ', c_6
+
     ELSE
       J_A         = channels(ichannel,1) / 2.0
       M_A         = channels(ichannel,2) / 2.0
@@ -168,7 +171,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 !           WRITE(of,*) 'E_sec= ', E_sec                            
 !           WRITE(of,*) 'omega vp = ', omega_vp                     
 !           WRITE(of,*) 'S = ', 3*c_au**3/(4*omega_vp**3) * (2*J_A+1)/tau_au      
-            gamma_b = c_pre * EXP(-c_exp * R_angstrom) + c_6/R_angstrom**6 &
+            gamma_b = (c_pre * EXP(-c_exp * R_angstrom) + c_6/R_angstrom**6) &
                       / number_of_in
             gamma_b_pairs = neq_pairs * gamma_b                        
                                                                      
