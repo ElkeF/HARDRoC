@@ -101,7 +101,7 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
   REAL, INTENT(IN), DIMENSION(number_of_fin2,3) :: fin2coord
 
 ! Data dictionary: counters
-  INTEGER :: i,j,k,l,row=1
+  INTEGER :: i,j,k,l,row=0
 
 ! Temporary arrays and output variables
   REAL, DIMENSION(1,3) :: xyz_in,xyz_fin1,xyz_fin2
@@ -150,7 +150,8 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
 
 ! in as reference
 !------------------------------------------------------
-          a_vec = xyz_in ! checked
+          !a_vec = xyz_in ! checked
+          a_vec = xyz_fin1 - xyz_in
           b_vec = xyz_fin2 - xyz_in ! checked
 !------------------------------------------------------
 
@@ -164,7 +165,7 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
 !          WRITE(*,*) 'norm a_vec: ', norm_row(a_vec,3) !checked
 !          WRITE(*,*) 'norm b_vec: ', norm_row(b_vec,3) !checked
 !          WRITE(*,*) 'Scalar product a_vec,b_vec: ', scalar_prod_row(a_vec,b_vec,3)! checked
-!          WRITE(*,*) 'argument', argument
+          WRITE(*,*) 'argument', argument
 
 
           Q = dist(xyz_in,xyz_fin1)
@@ -176,6 +177,8 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
 
           Qselect:IF (Q <= Qmax) THEN
 
+            row = row + 1
+
             temparray(row,1) = Q
             temparray(row,2) = R
             temparray(row,3) = theta
@@ -185,7 +188,6 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
 !          WRITE(*,130) (jacobi3(row,l),l=1,4)
             130 FORMAT(' ',4F8.3)
 
-            row = row + 1
 
           END IF Qselect
 
