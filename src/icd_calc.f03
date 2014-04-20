@@ -56,6 +56,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 
 ! Special for all variables
   INTEGER :: iM_Ap !counter for loop over all M_A'
+  REAL :: h_one ! willtake care of correct counting of nrel and rel states
   REAL :: gamma_all !will hold the result for all M_A' values of one distance
 
 
@@ -208,7 +209,12 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
       sigma     = sigmaabs / (1 + sigmarel)
       sigma_au  = sigma * megabarn_to_sqmeter * meter_to_bohr**2
 
-      tau      = tottau * (1 + 1/taurel)
+! Take care of non-reltivistic calculation
+      IF (MOD(2*J_Ap,2.0)==0) THEN
+        tau    = tottau
+      ELSE
+        tau      = tottau * (1 + 1/taurel)
+      END IF
       tau_au   = tau * second_to_atu
       WRITE(of,*) 'tottau= ', tottau
       WRITE(of,*) 'taurel= ', taurel
@@ -257,8 +263,14 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
             E_Coulomb  = 1/R_bohr * hartree_to_ev
             E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
 
+! Take care of non-reltivistic calculation
+            IF (MOD(2*J_Ap,2.0)==0) THEN
+              h_one = 1.0 / 2
+            ELSE
+              h_one = 1.0
+            END IF
 
-            all_M_Ap:DO iM_Ap=(INT(2*(M_A-1))),(INT(2*(-M_A+1)))
+            all_M_Ap:DO iM_Ap=(INT(2*(M_A-h_one))),(INT(2*(-M_A+h_one)))
 
               M_Ap = M_A + iM_Ap
 
@@ -271,10 +283,10 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
                 CASE DEFAULT
                   B_MAMAp = 0
               END SELECT
-!               WRITE(of,*) 'B_MAMAp**2 = ', B_MAMAp**2
+              !WRITE(of,*) 'B_MAMAp**2 = ', B_MAMAp**2
 
               wigner   = eval_wigner3j(J_Ap,one,J_A,-M_Ap,M_Ap-M_A,M_A)
-!               WRITE(of,*) 'Wigner3j symbol squared: ', wigner**2
+              !WRITE(of,*) 'Wigner3j symbol squared: ', wigner**2
 
 
 ! V  erfahre nur weiter, wenn die Sekundaerenergie >=0 ist
