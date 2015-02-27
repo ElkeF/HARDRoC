@@ -8,7 +8,7 @@ The *ETMD channel file* is a collection of numbers characterising the
 ICD channel to be investigated. A typical file would look like::
 
   # J_A   M_A  SIP(in)  shift(in)   J_D   M_D   SIP(fin1)  shift(fin1)   j_Bp  SIP(fin2)  shift(fin2)  sigmarel
-     1     1   29.2      -0.636      3      88     12.5        -1.3        3    12.5        -1.3       1.6
+     1     1   29.2      -0.636      3      88     12.5        -1.3        3    12.5        -1.3       0.625
      1     1   29.2      -0.636      1      1     12.5        -1.3         3    12.5        -1.3       1.6
 
 
@@ -82,5 +82,11 @@ sigma_rel
 ~~~~~~~~~
 Like the radiative lifetime, the ionization cross section is experimentally
 achieved for more than one state. The relation between the two has to be
-specified in sigma_rel. The total value of sigma is determined from experimental
+specified in sigma_rel. However, the ratio needs to be given as others/wanted.
+This unintuitive input allows calculations with only one specific ionization
+cross section as in the relativistic case. Otherwise dividing by 0 would give
+unintended errors.
+
+The total value of sigma is determined from experimental
 data in a library module.
+
