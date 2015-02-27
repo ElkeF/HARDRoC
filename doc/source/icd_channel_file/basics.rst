@@ -7,7 +7,7 @@ The *ICD channel file* is a collection of numbers characterising the
 ICD channel to be investigated. A typical file would look like::
 
   # J_A   M_A  SIP(in)  shift(in)   J_Ap   M_Ap  SIP(fin1)  shift(fin1)  tauabs  taurel  j_Bp  SIP(fin2)  shift(fin2)  sigma_rel
-   1     1   29.2      -0.636      3      88     12.5        -1.3       4.2E-9    2.0    3    12.5        -1.3           1.6  
+   1     1   29.2      -0.636      3      88     12.5        -1.3       4.2E-9    2.0    3    12.5        -1.3           0.625
    1     1   29.2      -0.636      1      1      12.5        -1.3       4.2E-9    2.0    3    12.5        -1.3           1.6  
 
 It is crucial to have the correct number of entries in every row.
@@ -90,5 +90,10 @@ sigma_rel
 ~~~~~~~~~
 Like the radiative lifetime, the ionization cross section is experimentally
 achieved for more than one state. The relation between the two has to be
-specified in sigma_rel. The total value of sigma is determined from experimental
+specified in sigma_rel. However, the ratio needs to be given as others/wanted.
+This unintuitive input allows calculations with only one specific ionization
+cross section as in the relativistic case. Otherwise dividing by 0 would give
+unintended errors.
+
+The total value of sigma is determined from experimental
 data in a library module.
