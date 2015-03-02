@@ -254,6 +254,7 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 
             gamma_b_all_M     = 0.0
             gamma_b_all_pairs = 0.0
+            gamma_b_pairs     = 0.0
 
 ! F  ind values for given pair
             neq_pairs  = INT(dist_stat(idist,1))
@@ -373,7 +374,6 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
         channel_sense:IF (E_in - E_fin1 - E_fin2 > 0) THEN
   
 !          WRITE(of,*) 'Processing ICD channel ', ichannel
-
           DO idist=1,no_dist
 
 ! F  ind values for given pair
