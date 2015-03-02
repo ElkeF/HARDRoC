@@ -1,0 +1,63 @@
+ icd_file: fit                                                                                                 
+ etmd_file: etmd_channels                                                                                       
+ Read do_pairs:  T
+ Read do_fit:  T
+ Read do_triples:  F
+ Read in_atom_type: Ar
+ Read fin_atom_type1: Xe
+ Read fin_atom_type2: Xe
+ Read Qmax:    5.00000000    
+ #initially  #final1     #final2
+            1           2           2
+ Incoord allocated:  T
+ Fin1coord allocated:  T
+ Fin2coord allocated:  T
+ Physical constants used in this programme
+                 Speed of light    2.9979244800000E+08
+              Planck's constant    6.6260697193983E-34
+      Rest mass of the electron    9.1093825050306E-31
+                Electron charge    1.6021765974586E-19
+        Fine structure constant    7.2973528876901E-03
+                             pi    3.1415927410126E+00
+                    Bohr radius    5.2917722287438E-11
+                 Hartree energy    4.3597443403766E-18
+  
+ Conversion factors used in this programme
+               Angstrom to Bohr    1.8897260427475E+00
+               Bohr to Angstrom    5.2917724847794E-01
+       Megabarn to square meter    1.0000000313744E-22
+                Second to a.t.u    4.1341370916405E+16
+               a.t.u. to Second    2.4188843951833E-17
+                    Joule to eV    6.2415091467100E+18
+                    eV to Joule    1.6021765974586E-19
+               Joule to Hartree    2.2937125097413E+17
+               Hartree to Joule    4.3597443403766E-18
+                  Hartree to eV    2.7211383819580E+01
+                  eV to Hartree    3.6749325692654E-02
+  
+ 
+ 
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ %%%%%%%%%%%%%%%%% ICD %%%%%%%%%%%%%%%%%%%
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+ No ICD channels=            1
+ Number of independent distances:            2
+ 
+ 
+ Processing ICD channel   1
+ 
+ Characterized by
+  J_A =  1     M_A =  1    J_A' =  3    M_A' = 17    j_B' =  3
+ 
+ Use fitted decay widths
+ All decay rates are given in eV
+ 
+   J_A  M_A J_A' j_B'   no pairs     R [AA]    Gamma one    Gamma all
+ ---------------------------------------------------------------------
+     1    1    3    3        1        4.000    5.810E-03    5.810E-03
+     1    1    3    3        1        5.866    5.843E-04    5.843E-04
+ ---------------------------------------------------------------------
+ Sum                                                        6.394E-03
+ 
+ Sum of ICD Gammas for all requested channels    6.39421213E-03

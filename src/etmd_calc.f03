@@ -117,7 +117,7 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
 ! Determine the ionization cross section
     CALL select_sigma_fit_para(quad,lin,const,oneover)
     sigma_abs = quad*omega_vp_ev**2 + lin*omega_vp_ev + const + oneover/omega_vp_ev
-    sigma     = sigma_abs / (1 + 1/sigmarel)
+    sigma     = sigma_abs / (1 + sigmarel)
     sigma_au  = sigma * megabarn_to_sqmeter * meter_to_bohr**2
 
 
