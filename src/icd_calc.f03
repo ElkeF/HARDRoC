@@ -248,6 +248,12 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 ! T  est whether this channel makes sense at all
         channel_sense_all:IF (E_in - E_fin1 - E_fin2 > 0) THEN
   
+! Take care of non-reltivistic calculation
+          IF (MOD(2*J_Ap,2.0)==0) THEN
+            h_one = 1.0 / 2
+          ELSE
+            h_one = 1.0
+          END IF
 
 ! E  ach and every pair.
           DO idist=1,no_dist
@@ -264,58 +270,52 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
             E_Coulomb  = 1/R_bohr * hartree_to_ev
             E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
 
-! Take care of non-reltivistic calculation
-            IF (MOD(2*J_Ap,2.0)==0) THEN
-              h_one = 1.0 / 2
-            ELSE
-              h_one = 1.0
-            END IF
-
-            all_M_Ap:DO iM_Ap=(INT(2*(M_A-h_one))),(INT(2*(-M_A+h_one)))
-
-              M_Ap = M_A + iM_Ap
-
-! S  et the M_A# dependent variables
-              SELECT CASE (INT(M_Ap - M_A))
-                CASE (-1,1)
-                  B_MAMAp = 1
-                CASE (0)
-                  B_MAMAp = -2
-                CASE DEFAULT
-                  B_MAMAp = 0
-              END SELECT
-              !WRITE(of,*) 'B_MAMAp**2 = ', B_MAMAp**2
-
-              wigner   = eval_wigner3j(J_Ap,one,J_A,-M_Ap,M_Ap-M_A,M_A)
-              !WRITE(of,*) 'Wigner3j symbol squared: ', wigner**2
-
-
-! V  erfahre nur weiter, wenn die Sekundaerenergie >=0 ist
-              IF (E_sec >= 0.0) THEN
-!                WRITE(of,*) 'E_sec= ', E_sec
-!                WRITE(of,*) 'omega vp = ', omega_vp
-!                WRITE(of,*) 'S = ', 3*c_au**3/(4*omega_vp**3) * (2*J_A+1)/tau_au
-                gamma_b = 2*pi/R_bohr**6 * B_MAMAp**2 * wigner**2 *(2*J_A+1)&
-                        & *3*c_au**4 *sigma_au/(16*pi**2 * omega_vp**4 * tau_au) * hartree_to_ev&
-                        & / number_of_in !Normalize to one ionization
-!                WRITE(of,*) 'Gamma beta = ', gamma_b
-                gamma_b_all_M = gamma_b_all_M + gamma_b
-      
-              END IF
-            END DO all_M_Ap
-
-            gamma_b_pairs = neq_pairs * gamma_b_all_M
-            
-!Wr  ite result to output file
-            WRITE(of,240) INT(2*J_A), INT(2*M_A), INT(2*J_Ap),&
-                          INT(2*j_Bp), INT(neq_pairs), R_angstrom,&
-                          gamma_b_all_M, gamma_b_pairs
-            !240 FORMAT (' ',4(1X,I4),4X,I5,6X,F7.3,4X,2(ES9.3,4X))
-! W  rite results to specfile
-            WRITE(ICD_outf,141) E_sec, gamma_b_pairs, R_angstrom
-            141 FORMAT (' ',F12.4,ES15.5,F12.4)
-
-            gamma_all = gamma_all + gamma_b_pairs
+! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist
+            ener_allow:IF (E_sec >= 0.0) THEN
+              all_M_Ap:DO iM_Ap=(INT(2*(M_A-h_one))),(INT(2*(-M_A+h_one)))
+  
+                M_Ap = M_A + iM_Ap
+  
+  ! S  et the M_A# dependent variables
+                SELECT CASE (INT(M_Ap - M_A))
+                  CASE (-1,1)
+                    B_MAMAp = 1
+                  CASE (0)
+                    B_MAMAp = -2
+                  CASE DEFAULT
+                    B_MAMAp = 0
+                END SELECT
+                !WRITE(of,*) 'B_MAMAp**2 = ', B_MAMAp**2
+  
+                wigner   = eval_wigner3j(J_Ap,one,J_A,-M_Ap,M_Ap-M_A,M_A)
+                !WRITE(of,*) 'Wigner3j symbol squared: ', wigner**2
+  
+  
+  !                WRITE(of,*) 'E_sec= ', E_sec
+  !                WRITE(of,*) 'omega vp = ', omega_vp
+  !                WRITE(of,*) 'S = ', 3*c_au**3/(4*omega_vp**3) * (2*J_A+1)/tau_au
+                  gamma_b = 2*pi/R_bohr**6 * B_MAMAp**2 * wigner**2 *(2*J_A+1)&
+                          & *3*c_au**4 *sigma_au/(16*pi**2 * omega_vp**4 * tau_au) * hartree_to_ev&
+                          & / number_of_in !Normalize to one ionization
+  !                WRITE(of,*) 'Gamma beta = ', gamma_b
+                  gamma_b_all_M = gamma_b_all_M + gamma_b
+        
+              END DO all_M_Ap
+  
+              gamma_b_pairs = neq_pairs * gamma_b_all_M
+              
+  !Wr  ite result to output file
+              WRITE(of,240) INT(2*J_A), INT(2*M_A), INT(2*J_Ap),&
+                            INT(2*j_Bp), INT(neq_pairs), R_angstrom,&
+                            gamma_b_all_M, gamma_b_pairs
+              !240 FORMAT (' ',4(1X,I4),4X,I5,6X,F7.3,4X,2(ES9.3,4X))
+  ! W  rite results to specfile
+              WRITE(ICD_outf,141) E_sec, gamma_b_pairs, R_angstrom
+              141 FORMAT (' ',F12.4,ES15.5,F12.4)
+  
+              gamma_all = gamma_all + gamma_b_pairs
+  
+            END IF ener_allow
 
           END DO 
 
