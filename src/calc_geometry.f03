@@ -59,6 +59,7 @@ SUBROUTINE create_dist_stat(distances,dist_stat,no_pairs,no_dist)
   INTEGER :: i,j,row=0 !counters
   REAL :: temp, ne_dist
   REAL :: thresh = 0.001
+  INTEGER :: ierror = 0
 
   
   DO i=1,no_pairs
@@ -79,6 +80,10 @@ SUBROUTINE create_dist_stat(distances,dist_stat,no_pairs,no_dist)
       dist_stat(row,2) = temp
     END IF
   END DO
+
+  OPEN(dist_outf, FILE='dist_stat', STATUS='UNKNOWN', ACTION='WRITE', IOSTAT=ierror)
+  WRITE(dist_outf,*) '#  R        number'
+  WRITE(dist_outf,'(1X,F7.3,3X,F5.1)') (dist_stat(i,2),dist_stat(i,1), i=1,no_dist)
 
 END SUBROUTINE create_dist_stat
 

@@ -14,4 +14,5 @@ REAL :: Qmax = 1000.0 !Maximum distance of Q which will be taken into account
 INTEGER,PARAMETER :: of = 30
 INTEGER :: ICD_outf = of+1
 INTEGER :: ETMD_outf = of+20
+INTEGER :: dist_outf = of+30
 END MODULE control
