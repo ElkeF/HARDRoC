@@ -135,47 +135,48 @@ SUBROUTINE calc_triples(incoord,fin1coord,fin2coord,jacobi3,number_of_in&
 !        WRITE(of,*) 'Distance between final ', distance
         not_same:IF (distance > thresh) THEN
 
-! COM as reference
-!------------------------------------------------------
-!          COM = eval_com2(xyz_in,xyz_fin1) !checked
-
-!          WRITE(of,*) 'COM= ', COM
-!          WRITE(of,*) 'xyz_in= ', xyz_in
-!          WRITE(of,*) 'xyz_fin1= ', xyz_fin1
-!          WRITE(of,*) 'xyz_fin2= ', xyz_fin2
-
-!          a_vec = xyz_in - COM ! checked
-!          b_vec = xyz_fin2 - COM ! checked
-!------------------------------------------------------
-
-! in as reference
-!------------------------------------------------------
-          !a_vec = xyz_in ! checked
-          a_vec = xyz_fin1 - xyz_in
-          b_vec = xyz_fin2 - xyz_in ! checked
-!------------------------------------------------------
-
-
-          argument = scalar_prod_row(a_vec,b_vec,3)/(norm_row(a_vec,3)*norm_row(b_vec,3))
-          argument = ANINT(argument*10000)/10000
-
-!          WRITE(*,*) 'a_vec: ', a_vec
-!          WRITE(*,*) 'b_vec: ', b_vec
-
-!          WRITE(*,*) 'norm a_vec: ', norm_row(a_vec,3) !checked
-!          WRITE(*,*) 'norm b_vec: ', norm_row(b_vec,3) !checked
-!          WRITE(*,*) 'Scalar product a_vec,b_vec: ', scalar_prod_row(a_vec,b_vec,3)! checked
-          WRITE(*,*) 'argument', argument
-
-
           Q = dist(xyz_in,xyz_fin1)
-!          R = dist(COM,xyz_fin2)
-          R = dist(xyz_in,xyz_fin2)
-          theta = ACOS(argument)
-          Coulomb_dist = dist(xyz_fin1,xyz_fin2)
-
-
           Qselect:IF (Q <= Qmax) THEN
+  
+  ! COM as reference
+  !------------------------------------------------------
+  !          COM = eval_com2(xyz_in,xyz_fin1) !checked
+  
+  !          WRITE(of,*) 'COM= ', COM
+  !          WRITE(of,*) 'xyz_in= ', xyz_in
+  !          WRITE(of,*) 'xyz_fin1= ', xyz_fin1
+  !          WRITE(of,*) 'xyz_fin2= ', xyz_fin2
+  
+  !          a_vec = xyz_in - COM ! checked
+  !          b_vec = xyz_fin2 - COM ! checked
+  !------------------------------------------------------
+  
+  ! in as reference
+  !------------------------------------------------------
+            !a_vec = xyz_in ! checked
+            a_vec = xyz_fin1 - xyz_in
+            b_vec = xyz_fin2 - xyz_in ! checked
+  !------------------------------------------------------
+  
+  
+            argument = scalar_prod_row(a_vec,b_vec,3)/(norm_row(a_vec,3)*norm_row(b_vec,3))
+            argument = ANINT(argument*10000)/10000
+  
+  !          WRITE(*,*) 'a_vec: ', a_vec
+  !          WRITE(*,*) 'b_vec: ', b_vec
+  
+  !          WRITE(*,*) 'norm a_vec: ', norm_row(a_vec,3) !checked
+  !          WRITE(*,*) 'norm b_vec: ', norm_row(b_vec,3) !checked
+  !          WRITE(*,*) 'Scalar product a_vec,b_vec: ', scalar_prod_row(a_vec,b_vec,3)! checked
+            WRITE(*,*) 'argument', argument
+  
+  
+  !          R = dist(COM,xyz_fin2)
+            R = dist(xyz_in,xyz_fin2)
+            theta = ACOS(argument)
+            Coulomb_dist = dist(xyz_fin1,xyz_fin2)
+  
+  
 
             row = row + 1
 
