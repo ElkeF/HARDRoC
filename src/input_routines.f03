@@ -54,6 +54,9 @@ IMPLICIT NONE
         CASE ('Qmax')
            READ(buffer, *, IOSTAT=ierror) Qmax
            WRITE(of,*) 'Read Qmax: ', Qmax
+        CASE ('Rmax')
+           READ(buffer, *, IOSTAT=ierror) Rmax
+           WRITE(of,*) 'Read Rmax: ', Rmax
         CASE default
            WRITE(of,*) 'Skipping invalid label at line', line
         END SELECT

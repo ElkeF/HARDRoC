@@ -40,7 +40,7 @@ END SUBROUTINE calc_distances
 
 
 
-SUBROUTINE create_dist_stat(distances,dist_stat,no_pairs,no_dist)
+SUBROUTINE create_dist_temp(distances,dist_temp,no_pairs,no_dist,no_dist_thresh)
 ! Purpose: To take the array distances and to write an new array
 !          dist_stat containing how often a distance is invoked
 !          and the distance itself
@@ -53,7 +53,8 @@ SUBROUTINE create_dist_stat(distances,dist_stat,no_pairs,no_dist)
 ! Data dictionary: exchanged with the main program
   INTEGER, INTENT(IN) :: no_pairs, no_dist
   REAL, DIMENSION(no_pairs) :: distances
-  REAL, DIMENSION(no_dist,2), INTENT(OUT) :: dist_stat
+  REAL, DIMENSION(no_dist,2), INTENT(OUT) :: dist_temp
+  INTEGER             :: no_dist_thresh
 
 ! Data dictionary: temporary variables
   INTEGER :: i,j,row=0 !counters
@@ -76,17 +77,52 @@ SUBROUTINE create_dist_stat(distances,dist_stat,no_pairs,no_dist)
         END IF
       END DO
       
-      dist_stat(row,1) = ne_dist
-      dist_stat(row,2) = temp
+      dist_temp(row,1) = ne_dist
+      dist_temp(row,2) = temp
     END IF
   END DO
 
+  no_dist_thresh = 0
+
+  DO i=1, no_dist
+    IF (dist_temp(i,2) < Rmax) THEN
+      no_dist_thresh = no_dist_thresh + 1
+    END IF
+  END DO
+
+  
+
   OPEN(dist_outf, FILE='dist_stat', STATUS='UNKNOWN', ACTION='WRITE', IOSTAT=ierror)
   WRITE(dist_outf,*) '#  R        number'
-  WRITE(dist_outf,'(1X,F7.3,3X,F5.1)') (dist_stat(i,2),dist_stat(i,1), i=1,no_dist)
+  WRITE(dist_outf,'(1X,F7.3,3X,F5.1)') (dist_temp(i,2),dist_temp(i,1), i=1,no_dist)
+
+END SUBROUTINE create_dist_temp
+
+
+SUBROUTINE create_dist_stat(dist_temp,dist_stat,no_dist,no_dist_thresh)
+! Purpose: Reduce the number of calculated distances according to the threshold
+!          given in the input file
+
+  use control
+
+!Data dictionary
+  INTEGER :: no_dist, no_dist_thresh
+  REAL,INTENT(IN),DIMENSION(no_dist,2)         :: dist_temp
+  REAL,INTENT(OUT),DIMENSION(no_dist_thresh,2) :: dist_stat
+
+! Data dictionary: Local Variables
+  INTEGER :: i
+  INTEGER :: row = 0
+
+  DO i = 1, no_dist
+    IF (dist_temp(i,2) < Rmax) THEN
+      row = row + 1
+      dist_stat(row,1) = dist_temp(i,1)
+      dist_stat(row,2) = dist_temp(i,2)
+    END IF
+  END DO
 
 END SUBROUTINE create_dist_stat
-
 
 
 

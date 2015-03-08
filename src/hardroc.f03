@@ -31,7 +31,7 @@ CHARACTER(len=106)  :: nmout != 'output'
 INTEGER :: number_of_in, number_of_fin1, number_of_fin2
 INTEGER :: allocstatin=0, allocstatfin1=0, allocstatfin2=0
 INTEGER :: ierror = 0 ! used for outputfile
-INTEGER :: no_pairs, no_triples, no_dist, no_ind_triples
+INTEGER :: no_pairs, no_triples, no_dist, no_ind_triples, no_dist_thresh
 INTEGER :: no_channels ! How many lines the file channels has
 
 
@@ -44,6 +44,7 @@ REAL, ALLOCATABLE, DIMENSION(:,:) :: incoord !coordinates of initially ionized
 REAL, ALLOCATABLE, DIMENSION(:,:) :: fin1coord ! coordinates of fin1
 REAL, ALLOCATABLE, DIMENSION(:,:) :: fin2coord !coords of fin2
 REAL, ALLOCATABLE, DIMENSION(:)   :: distances !array of distances for ICD
+REAL, ALLOCATABLE, DIMENSION(:,:) :: dist_temp !number distance | distance
 REAL, ALLOCATABLE, DIMENSION(:,:) :: dist_stat !number distance | distance
 REAL, ALLOCATABLE, DIMENSION(:,:) :: channels  ! array specifying the parameters of the icd channels
 REAL, ALLOCATABLE, DIMENSION(:,:) :: jacobi3 ! array to hold jacobi coords of all triples
@@ -125,15 +126,19 @@ pairs:IF (do_pairs) THEN
 ! distances ne_dist and the corresponding distance.
 ! The rank 2 array is totally real, because arrays are not allowed
 ! to contain different types
-  ALLOCATE(dist_stat(no_dist,2))
-  CALL create_dist_stat(distances,dist_stat,no_pairs,no_dist)
+  ALLOCATE(dist_temp(no_dist,2))
+  CALL create_dist_temp(distances,dist_temp,no_pairs,no_dist,no_dist_thresh)
+  DEALLOCATE(distances)
 
 !  WRITE(of,121) dist_stat
 !  121 FORMAT (' ',F5.1,F8.3)
 
-  DEALLOCATE(distances)
+  ALLOCATE(dist_stat(no_dist_thresh,2))
+  CALL create_dist_stat(dist_temp,dist_stat,no_dist,no_dist_thresh)
+  DEALLOCATE(dist_temp)
 
-  CALL calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
+
+  CALL calc_icd_gamma(channels,dist_stat,no_channels,no_dist_thresh,number_of_in)
   DEALLOCATE(channels)
   DEALLOCATE(dist_stat)
 

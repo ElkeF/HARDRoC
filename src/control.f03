@@ -7,6 +7,7 @@ CHARACTER(2) :: in_atom_type = '', fin_atom_type1 = '', fin_atom_type2 = ''
 
 ! Parameters for reducing numerical effort
 REAL :: Qmax = 1000.0 !Maximum distance of Q which will be taken into account
+REAL :: Rmax = 1000.0! Maximum ditance for R in ICD
 
 !Output file variables
 ! Data dictionary: io number start of output files
