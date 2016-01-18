@@ -1,6 +1,7 @@
 pairs T
 fit F
-triples T
+eff T
+triples F
 atin Ar
 atfin1 Xe
 atfin2 Xe
