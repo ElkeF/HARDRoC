@@ -39,6 +39,64 @@ END SUBROUTINE calc_distances
 
 
 
+SUBROUTINE calc_dist_eff(incoord,fin2coord,distances,number_of_in,&
+                         &number_of_fin2,no_pairs,no_dist,smallest_R_open)
+use control
+use geometry_fun
+
+IMPLICIT NONE
+
+! Data dictionary
+  INTEGER :: ierror = 0, row=1
+
+  ! Arrays of coordinates and distances
+  INTEGER :: i, j !counters
+  INTEGER :: number_of_in, number_of_fin2, no_pairs
+  INTEGER, INTENT(OUT) :: no_dist
+  REAL, DIMENSION(number_of_in,3), INTENT(IN) :: incoord
+  REAL, DIMENSION(number_of_fin2,3), INTENT(IN) :: fin2coord
+  REAL, DIMENSION(no_pairs), INTENT(OUT) :: distances 
+  REAL, DIMENSION(1,3) :: xyz_in, xyz_fin ! help arrays to evaluate function dist
+  REAL, INTENT(IN) :: smallest_R_open
+  REAL :: eff !ICD efficiency
+
+  INTEGER :: no_no_decay, partners ! counters
+
+  no_no_decay = 0
+
+  DO i=1,number_of_in
+    partners = 0
+    DO j=1,number_of_fin2
+      xyz_in = incoord(i:i,1:3)
+      xyz_fin = fin2coord(j:j,1:3)
+      distances(row) = dist(xyz_in,xyz_fin)
+!      WRITE (of,*) "Distance ", row, "is ", distances(row)
+      IF (distances(row) > smallest_R_open) THEN
+        partners = partners + 1
+      END IF
+      row = row+1
+    END DO
+    IF (partners == 0) THEN
+      no_no_decay = no_no_decay + 1
+    END IF
+  END DO
+
+  eff = 1 - (no_no_decay / number_of_in)
+
+  WRITE(of,*)
+  WRITE(of,*) '--------------------------------'
+  WRITE(of,*) 'ICD efficiency = ', eff
+  WRITE(of,*) '--------------------------------'
+
+  no_dist = no_ind_entries(distances,no_pairs)
+  WRITE(of,*) ''
+  WRITE(of,*) 'Number of independent distances: ', no_dist
+  WRITE(of,*) ''
+
+END SUBROUTINE calc_dist_eff
+
+
+
 
 SUBROUTINE create_dist_temp(distances,dist_temp,no_pairs,no_dist,no_dist_thresh)
 ! Purpose: To take the array distances and to write an new array

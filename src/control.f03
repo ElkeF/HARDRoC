@@ -2,6 +2,7 @@ MODULE control
 !Default values of the variables
 LOGICAL      :: do_pairs = .FALSE.
 LOGICAL      :: do_fit   = .FALSE.
+LOGICAL      :: do_eff   = .FALSE.
 LOGICAL      :: do_triples = .FALSE.
 CHARACTER(2) :: in_atom_type = '', fin_atom_type1 = '', fin_atom_type2 = ''
 

@@ -15,6 +15,7 @@ use lenfile
 use array_operations
 !use wigner3j
 use physical_constants
+use efficiency
 IMPLICIT NONE
 
 !Data dictionary: Parameters for Inputfile reading
@@ -34,6 +35,8 @@ INTEGER :: ierror = 0 ! used for outputfile
 INTEGER :: no_pairs, no_triples, no_dist, no_ind_triples, no_dist_thresh
 INTEGER :: no_channels ! How many lines the file channels has
 
+! Data dictionary: variables of global use
+REAL    :: smallest_R_open
 
 !Test
 REAL :: factest
@@ -115,12 +118,18 @@ pairs:IF (do_pairs) THEN
 
   CALL read_icd_channels(icd_channel_file,channels,no_channels)
 
+  CALL channel_opening_distances(no_channels,channels,smallest_R_open)
+
   no_pairs = number_of_in*number_of_fin2
   ALLOCATE(distances(no_pairs))
 
-  CALL calc_distances(incoord,fin2coord,distances,number_of_in,&
-                     &number_of_fin2,no_pairs,no_dist)
-
+  IF (do_eff) THEN
+    CALL calc_dist_eff(incoord,fin2coord,distances,number_of_in,&
+                       &number_of_fin2,no_pairs,no_dist,smallest_R_open)
+  ELSE
+    CALL calc_distances(incoord,fin2coord,distances,number_of_in,&
+                       &number_of_fin2,no_pairs,no_dist)
+  END IF
 
 ! Create array dist_stat with the format with the number of equal
 ! distances ne_dist and the corresponding distance.
