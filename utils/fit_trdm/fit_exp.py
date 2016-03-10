@@ -14,10 +14,10 @@ def residuals(p, y, x):
 def peval(x, p):
         return p[0]*(exp(-p[1]*x)) + p[2]
 
-filename=('ArXe.txt')
+filename=('ArKr.txt')
 data = np.loadtxt(filename)
 
-y = data[:,1]
+y = data[:,2]
 x = data[:,0]
 
 #y = y.astype(np.float64)

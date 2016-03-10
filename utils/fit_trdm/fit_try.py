@@ -1,3 +1,5 @@
+#! /opt/local/bin/python
+
 """
 extended_curve_fit_to_data.py:
 
@@ -153,10 +155,10 @@ p=[factor,alpha,const]
 #   unpack=True transposes lines in columns, e.g. if each line has an x, y, z
 #               triplet, then x, y, z = numpy.loadtxt will load the data into
 #               x[i], y[i], z[i] instead of xyz[i]
-filename =('ArXe.txt')
+filename =('ArKr.txt')
 data = numpy.loadtxt(filename)
 x_data  = data[:,0]
-y_data  = data[:,3]
+y_data  = data[:,5]
 dy_data = data[:,6]
 
 #x_data, y_data, dy_data = numpy.loadtxt('ArXe_test.txt', unpack=True, skiprows=0)
