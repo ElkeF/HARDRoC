@@ -26,6 +26,53 @@ SUBROUTINE select_trdm_fit_para(factor,alpha,const,dir)
 
         donor:SELECT CASE (fin_atom_type1)
 
+          CASE('Kr')
+            SELECT CASE (INT(2*J_D))
+              CASE(3)
+                SELECT CASE(INT(2*M_D))
+                  CASE(3)
+                    factor = ArKr_1_1_3_3_factor
+                    alpha  = ArKr_1_1_3_3_alpha
+                    const  = ArKr_1_1_3_3_const
+                    dir    = 'x'
+                  CASE(1)
+                    factor = ArKr_1_1_3_1_factor
+                    alpha  = ArKr_1_1_3_1_alpha
+                    const  = ArKr_1_1_3_1_const
+                    dir    = 'z'
+                  CASE(-1)
+                    factor = ArKr_1_1_3_m1_factor
+                    alpha  = ArKr_1_1_3_m1_alpha
+                    const  = ArKr_1_1_3_m1_const
+                    dir    = 'x'
+                  CASE DEFAULT
+                    WRITE(of,*) 'No TRDM provided for this M_D.'
+                    factor = 0
+                    alpha  = 0
+                    const  = 0
+                END SELECT
+              CASE(1)
+                SELECT CASE(INT(2*M_D))
+                  CASE(1)
+                    factor = ArKr_1_1_1_1_factor
+                    alpha  = ArKr_1_1_1_1_alpha
+                    const  = ArKr_1_1_1_1_const
+                    dir    = 'z'
+                  CASE(-1)
+                    factor = ArKr_1_1_1_m1_factor
+                    alpha  = ArKr_1_1_1_m1_alpha
+                    const  = ArKr_1_1_1_m1_const
+                    dir    = 'x'
+                  CASE DEFAULT
+                    WRITE(of,*) 'No TRDM provided for this M_D.'
+                    factor = 0
+                    alpha  = 0
+                    const  = 0
+                END SELECT
+              CASE DEFAULT
+                WRITE(of,*) 'No TRDM provided for this value of J_D.'
+            END SELECT
+
           CASE('Xe')
             SELECT CASE (INT(2*J_D))
               CASE(3)
