@@ -59,6 +59,7 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
   INTEGER :: ichannel
   INTEGER :: itriple
   INTEGER :: iM_D !counter for loop over all M_D
+  REAL    :: h_one !help counter to distinguish between rel & nrel
 
 ! Data dictionary: Results
   REAL :: gamma_all_triples
@@ -172,7 +173,15 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
           gamma_b_all_M = 0
           gamma_b_all_triples = 0
 
-          all_M_Ap:DO iM_D=(INT(2*(M_A-1))),(INT(2*(-M_A+1)))
+! Take care of non-reltivistic calculation
+          IF (MOD(2*J_Ap,2.0)==0) THEN
+            h_one = 1.0 / 2
+            WRITE(of,*) 'non-relativistic ETMD channel'
+          ELSE
+            h_one = 1.0
+          END IF
+
+          all_M_Ap:DO iM_D=(INT(2*(M_A-h_one))),(INT(2*(-M_A+h_one)))
 
             M_D = M_A + iM_D
 ! Set the M_D dependent variables
