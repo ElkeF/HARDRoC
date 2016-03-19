@@ -128,7 +128,6 @@ SUBROUTINE select_trdm_fit_para(factor,alpha,const,dir)
       END IF
 
       IF ((INT(2*J_A) == 0).AND.(INT(2*M_A) == 0)) THEN
-      WRITE(of,*) 'non-relativistic TRDM'
 
         donor_nrel:SELECT CASE (fin_atom_type1)
 
