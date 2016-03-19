@@ -174,7 +174,8 @@ SUBROUTINE calc_etmd_gamma(channels,triple_parameters,no_channels,&
           gamma_b_all_triples = 0
 
 ! Take care of non-reltivistic calculation
-          IF (MOD(2*J_Ap,2.0)==0) THEN
+          !WRITE(of,*) 'MOD(2*J_D,2.0)', MOD(2*J_D,2.0)
+          IF (MOD(2*J_D,2.0)==0) THEN
             h_one = 1.0 / 2
             WRITE(of,*) 'non-relativistic ETMD channel'
           ELSE

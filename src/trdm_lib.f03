@@ -33,7 +33,7 @@ REAL, PARAMETER :: ArKr_1_1_1_m1_const  = -0.000085
 REAL, PARAMETER :: ArKr_0_0_2_0_factor  = 8.747862
 REAL, PARAMETER :: ArKr_0_0_2_0_alpha   = 1.816280
 REAL, PARAMETER :: ArKr_0_0_2_0_const   = -0.000020
-! J_A=0, M_A=0, J_D=2, M_D=0
+! J_A=0, M_A=0, J_D=2, M_D=+-1
 REAL, PARAMETER :: ArKr_0_0_2_1_factor  = 73.219448
 REAL, PARAMETER :: ArKr_0_0_2_1_alpha   = 1.676794
 REAL, PARAMETER :: ArKr_0_0_2_1_const   = -0.000541
