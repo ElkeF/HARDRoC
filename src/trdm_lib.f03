@@ -28,6 +28,21 @@ REAL, PARAMETER :: ArKr_1_1_1_m1_factor = 10.089065
 REAL, PARAMETER :: ArKr_1_1_1_m1_alpha  = 1.685403
 REAL, PARAMETER :: ArKr_1_1_1_m1_const  = -0.000085
 
+!%%%%%%%%%%%%%% non-relativistic %%%%%%%%%%%%%%%%%%%%%%%%%%%
+! J_A=0, M_A=0, J_D=2, M_D=0
+REAL, PARAMETER :: ArKr_0_0_2_0_factor  = 8.747862
+REAL, PARAMETER :: ArKr_0_0_2_0_alpha   = 1.816280
+REAL, PARAMETER :: ArKr_0_0_2_0_const   = -0.000020
+! J_A=0, M_A=0, J_D=2, M_D=0
+REAL, PARAMETER :: ArKr_0_0_2_1_factor  = 73.219448
+REAL, PARAMETER :: ArKr_0_0_2_1_alpha   = 1.676794
+REAL, PARAMETER :: ArKr_0_0_2_1_const   = -0.000541
+!! J_A=1, M_A=1, J_D=3, M_D=-1
+!REAL, PARAMETER :: ArKr_0_0_1_m1_factor = 
+!REAL, PARAMETER :: ArKr_0_0_1_m1_alpha  = 
+!REAL, PARAMETER :: ArKr_0_0_1_m1_const  = 
+
+
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !%%%%%%%%%%%% ArXe %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

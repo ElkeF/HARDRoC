@@ -155,10 +155,10 @@ p=[factor,alpha,const]
 #   unpack=True transposes lines in columns, e.g. if each line has an x, y, z
 #               triplet, then x, y, z = numpy.loadtxt will load the data into
 #               x[i], y[i], z[i] instead of xyz[i]
-filename =('ArKr.txt')
+filename =('ArKr_nrel.txt')
 data = numpy.loadtxt(filename)
 x_data  = data[:,0]
-y_data  = data[:,5]
+y_data  = data[:,2]
 dy_data = data[:,6]
 
 #x_data, y_data, dy_data = numpy.loadtxt('ArXe_test.txt', unpack=True, skiprows=0)
