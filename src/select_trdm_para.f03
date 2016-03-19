@@ -128,12 +128,13 @@ SUBROUTINE select_trdm_fit_para(factor,alpha,const,dir)
       END IF
 
       IF ((INT(2*J_A) == 0).AND.(INT(2*M_A) == 0)) THEN
+      WRITE(of,*) 'non-relativistic TRDM'
 
         donor_nrel:SELECT CASE (fin_atom_type1)
 
           CASE('Kr')
             SELECT CASE (INT(2*J_D))
-              CASE(0)
+              CASE(2)
                 SELECT CASE(INT(2*M_D))
                   CASE(0)
                     factor = ArKr_0_0_2_0_factor
