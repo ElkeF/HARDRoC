@@ -142,8 +142,12 @@ def gamma(x):
     #   Exponential variable         : beta
     #   dipole interaction           : gamma
     #   Constant                     : delta
-    return alpha()* numpy.exp(0-beta()*x) + 6.204031/x**6 
+    #return alpha()* numpy.exp(0-beta()*x) + 6.204031/x**6 
     #return alpha()* numpy.exp(0-beta()*x) + gamma()/x**6 
+    return alpha() * numpy.exp(0-beta()*x) / (x-gamma())**6
+    #return alpha() * numpy.exp(0-beta()*x)
+    #return alpha() * (numpy.exp(0-beta()*x) + numpy.exp(0-epsilon()*x)) / (x-gamma())**6
+    #return alpha() * (numpy.exp(0-beta()*x) + numpy.exp(0-epsilon()*x))
     #return  gamma()/x**6 
 
 ## Choose function
@@ -154,7 +158,9 @@ func = gamma
 #const   = Parameter("const",3)
 alpha   = Parameter("alpha",1)
 beta    = Parameter("beta",1)
-#gamma   = Parameter("gamma",20)
+gamma   = Parameter("gamma",-0.0)
+#delta   = Parameter("delta",1.0)
+#epsilon = Parameter("epsilon",0.1)
 #quad    = Parameter("quad",1)
 #tetra   = Parameter("tetra",1)
 #octa    = Parameter("octa",1)
@@ -171,7 +177,9 @@ beta    = Parameter("beta",1)
 #    print "\nInvalid width parameter name.\n"
     
     
-p=[alpha,beta]
+#p=[alpha,beta,gamma,epsilon]
+#p=[alpha,beta,epsilon]
+p=[alpha,beta,gamma]
 #p=[gamma]
 
 ## Read Data
@@ -179,7 +187,7 @@ p=[alpha,beta]
 #               triplet, then x, y, z = numpy.loadtxt will load the data into
 #               x[i], y[i], z[i] instead of xyz[i]
 #filename =('../../exppar_lib/sigma/Ar.dat')
-filename =('Ne2.dat')
+filename =('He+Mg_ETMD_GammaR.dat')
 data = numpy.loadtxt(filename)
 x_data  = data[:,0]
 y_data  = data[:,1]
