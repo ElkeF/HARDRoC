@@ -1,3 +1,3 @@
 # HARDRoC
 
-The documentation is found here: http://www.pci.uni-heidelberg.de/tc/usr/elke/hardroc/html/main.html
+The documentation is to be found here: http://www.pci.uni-heidelberg.de/tc/usr/elke/hardroc/html/main.html
