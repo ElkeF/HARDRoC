@@ -164,7 +164,11 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
           R_angstrom = dist_stat(idist,2)
           R_bohr     = R_angstrom * angstrom_to_bohr
                                                                        
-          E_Coulomb  = 1/R_bohr * hartree_to_ev                        
+          IF (do_RICD .EQV. .FALSE.) THEN
+            E_Coulomb  = 1/R_bohr * hartree_to_ev                        
+          ELSE
+            E_Coulomb = 0
+          END IF
           E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb              
                                                                        
 ! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist            HIER!
@@ -267,7 +271,11 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
             R_angstrom = dist_stat(idist,2)
             R_bohr     = R_angstrom * angstrom_to_bohr
       
-            E_Coulomb  = 1/R_bohr * hartree_to_ev
+            IF (do_RICD .EQV. .FALSE.) THEN
+              E_Coulomb  = 1/R_bohr * hartree_to_ev                        
+            ELSE
+              E_Coulomb = 0
+            END IF
             E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
 
 ! Verfahre nur weiter, wenn die Sekundaerenergie >=0 ist
@@ -382,7 +390,11 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
 !            WRITE(of,*) 'R_ang = ', R_angstrom
             R_bohr     = R_angstrom * angstrom_to_bohr
       
-            E_Coulomb  = 1/R_bohr * hartree_to_ev
+            IF (do_RICD .EQV. .FALSE.) THEN
+              E_Coulomb  = 1/R_bohr * hartree_to_ev                        
+            ELSE
+              E_Coulomb = 0
+            END IF
             E_sec      = E_in - E_fin1 - E_fin2 - E_Coulomb
 
 ! V  erfahre nur weiter, wenn die Sekundaerenergie >=0 ist
