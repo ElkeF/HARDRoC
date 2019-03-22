@@ -18,6 +18,11 @@ SUBROUTINE select_sigma_fit_para(quad,lin,const,oneover)
 
   inatom: SELECT CASE (fin_atom_type2)
   
+    CASE('Hx')
+      quad    = He1s2p_quad
+      lin     = He1s2p_lin
+      const   = He1s2p_const
+      oneover = He1s2p_oneover
     CASE('Ne')
       quad    = Ne2p_quad
       lin     = Ne2p_lin
