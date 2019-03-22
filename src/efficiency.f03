@@ -58,7 +58,11 @@ CONTAINS
       R_angstrom(ichannel) = R_bohr * bohr_to_angstrom
     END DO
 
-    smallest_R_open = MINVAL(R_angstrom)
+    IF (do_RICD) THEN
+      smallest_R_open = 0.0
+    ELSE
+      smallest_R_open = MINVAL(R_angstrom)
+    END IF
 
     WRITE(of,*) '' 
     WRITE(of,*) 'Channel   channel opening distance'
