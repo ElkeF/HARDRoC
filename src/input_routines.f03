@@ -41,7 +41,10 @@ IMPLICIT NONE
            WRITE(of,*) 'Read do_fit: ', do_fit
         CASE ('eff')
            READ(buffer, *, IOSTAT=ierror) do_eff
-           WRITE(of,*) 'Read do_fit: ', do_eff
+           WRITE(of,*) 'Read do_eff: ', do_eff
+        CASE ('RICD')
+           READ(buffer, *, IOSTAT=ierror) do_RICD
+           WRITE(of,*) 'Read do_RICD: ', do_RICD
         CASE ('triples')
            READ(buffer, *, IOSTAT=ierror) do_triples
            WRITE(of,*) 'Read do_triples: ', do_triples

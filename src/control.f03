@@ -4,6 +4,7 @@ LOGICAL      :: do_pairs = .FALSE.
 LOGICAL      :: do_fit   = .FALSE.
 LOGICAL      :: do_eff   = .FALSE.
 LOGICAL      :: do_triples = .FALSE.
+LOGICAL      :: do_RICD = .FALSE.
 CHARACTER(2) :: in_atom_type = '', fin_atom_type1 = '', fin_atom_type2 = ''
 
 ! Parameters for reducing numerical effort
