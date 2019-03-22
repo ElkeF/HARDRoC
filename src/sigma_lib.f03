@@ -4,6 +4,13 @@ MODULE sigma_library
 ! f(x) =  quad*x^2 + lin*x + const + oneover/x
 ! Here x is of course the energy of the virtual photon in eV.
 
+! ionization after excitation, state: He 1s2p
+! Atomic and Nuclear Data Tables ,  (1976)
+  REAL,PARAMETER :: He1s2p_quad    =  -0.036486
+  REAL,PARAMETER :: He1s2p_lin     =   1.659328
+  REAL,PARAMETER :: He1s2p_const   = -23.078388
+  REAL,PARAMETER :: He1s2p_oneover = 100.082905
+
 ! Ne p, combined 3/2 and 1/2
 ! Atomic and Nuclear Data Tables ,  (1976)
   REAL,PARAMETER :: Ne2p_quad    =     0.023484
