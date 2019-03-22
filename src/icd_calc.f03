@@ -63,6 +63,9 @@ SUBROUTINE calc_icd_gamma(channels,dist_stat,no_channels,no_dist,number_of_in)
   each_channel:DO ichannel=1,no_channels
 
     gamma_all = 0.0
+    gamma_b_pairs = 0.0
+    gamma_b_all_pairs = 0.0
+    gamma_b_all_M = 0.0
 
 
 !
