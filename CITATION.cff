@@ -1,0 +1,15 @@
+cff-version: 0.9-RC1
+message: "If you use, or want to cite, HARDRoC in this version (v1.0.0), please use the following metadata."
+references:
+  - type: software
+    authors:
+      - family-names: Fasshauer
+        given-names: Elke
+        orcid: 0000-0001-8187-6052
+        role: main-author
+    title: "HARDRoC - Hunting Asymptotic Relativistic Decay Rates of Clusters"
+    version: v1.0.0
+    repository-code: https://github.com/ElkeF/HARDRoC
+    year: 2018
+    date-published: 2018-02-19
+    doi: 10.5281/zenodo.1175954
