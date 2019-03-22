@@ -1,4 +1,4 @@
-#!/opt/local/bin/python
+#!/usr/bin/python
 """
 extended_curve_fit_to_data.py:
 
@@ -124,9 +124,9 @@ def exponential(x):
 
 def one_over_x(x):
     # An ionization cross section with
-    #   Prefactor                    : factor
+    #   Prefactor                    : oneover
     #   Additive constant            : const
-    return factor() / x + const
+    return oneover() / x + const()
 
 def poly2_m1(x):
     # A polynomial ax^2 + bx + c + d/r
@@ -138,6 +138,7 @@ def poly2_m1(x):
 
 ## Choose function
 func = poly2_m1
+#func = one_over_x
 ## Define the fit parameters, guessing some starting values
 #factor  = Parameter("factor",1)
 #alpha   = Parameter("alpha",0.5)
@@ -159,6 +160,7 @@ oneover = Parameter("oneover",1)
 #    print "\nInvalid width parameter name.\n"
     
     
+#p=[const,oneover]
 p=[quad,lin,const,oneover]
 
 ## Read Data
@@ -166,11 +168,14 @@ p=[quad,lin,const,oneover]
 #               triplet, then x, y, z = numpy.loadtxt will load the data into
 #               x[i], y[i], z[i] instead of xyz[i]
 #filename =('../../exppar_lib/sigma/Ar.dat')
-filename =('Ar.dat')
+#filename =('Ar.dat')
+filename =('He1s2p_PRA.dat')
+#filename =('He_cross_shift.dat')
+#filename =('He_cross.dat')
 data = numpy.loadtxt(filename)
 x_data  = data[:,0]
-y_data  = data[:,1]
-dy_data = data[:,2]
+y_data  = data[:,3]
+dy_data = data[:,4]
 
 #x_data, y_data, dy_data = numpy.loadtxt('ArXe_test.txt', unpack=True, skiprows=0)
 
