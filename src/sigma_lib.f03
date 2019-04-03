@@ -11,6 +11,28 @@ MODULE sigma_library
   REAL,PARAMETER :: He1s2p_const   = -23.078388
   REAL,PARAMETER :: He1s2p_oneover = 100.082905
 
+!! ionization after excitation, state: He 1s3p
+!! Atomic and Nuclear Data Tables ,  (1976)
+!! better for small energy differences
+!  REAL,PARAMETER :: He1s3p_quad    =  -0.008797
+!  REAL,PARAMETER :: He1s3p_lin     =   0.385338
+!  REAL,PARAMETER :: He1s3p_const   =  -5.203295
+!  REAL,PARAMETER :: He1s3p_oneover =  22.567650
+
+! ionization after excitation, state: He 1s3p
+! Atomic and Nuclear Data Tables ,  (1976)
+  REAL,PARAMETER :: He1s3p_quad    =  -0.006761
+  REAL,PARAMETER :: He1s3p_lin     =   0.319469
+  REAL,PARAMETER :: He1s3p_const   =  -4.641940
+  REAL,PARAMETER :: He1s3p_oneover =  21.261983
+
+! Na 3s
+! webcross sections elettra
+  REAL,PARAMETER :: Na3s_quad    =     0.000053
+  REAL,PARAMETER :: Na3s_lin     =    -0.005798
+  REAL,PARAMETER :: Na3s_const   =     0.191587
+  REAL,PARAMETER :: Na3s_oneover =     0.147936
+
 ! Ne p, combined 3/2 and 1/2
 ! Atomic and Nuclear Data Tables ,  (1976)
   REAL,PARAMETER :: Ne2p_quad    =     0.023484

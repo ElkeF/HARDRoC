@@ -23,6 +23,16 @@ SUBROUTINE select_sigma_fit_para(quad,lin,const,oneover)
       lin     = He1s2p_lin
       const   = He1s2p_const
       oneover = He1s2p_oneover
+    CASE('Xx')
+      quad    = He1s3p_quad
+      lin     = He1s3p_lin
+      const   = He1s3p_const
+      oneover = He1s3p_oneover
+    CASE('Na')
+      quad    = Na3s_quad
+      lin     = Na3s_lin
+      const   = Na3s_const
+      oneover = Na3s_oneover
     CASE('Ne')
       quad    = Ne2p_quad
       lin     = Ne2p_lin

@@ -169,13 +169,13 @@ p=[quad,lin,const,oneover]
 #               x[i], y[i], z[i] instead of xyz[i]
 #filename =('../../exppar_lib/sigma/Ar.dat')
 #filename =('Ar.dat')
-filename =('He1s2p_PRA.dat')
-#filename =('He_cross_shift.dat')
+#filename =('He1s3p_PRA.dat')
+filename =('Na3s.dat')
 #filename =('He_cross.dat')
 data = numpy.loadtxt(filename)
 x_data  = data[:,0]
-y_data  = data[:,3]
-dy_data = data[:,4]
+y_data  = data[:,1]
+dy_data = data[:,2]
 
 #x_data, y_data, dy_data = numpy.loadtxt('ArXe_test.txt', unpack=True, skiprows=0)
 
