@@ -17,4 +17,5 @@ BOHR2M = 5.291772e-11
 #crosssection conversions
 
 MB2M2 = 1e-22
-MB2AU = 
+MB2AU = MB2M2 * M2BOHR**2
+AU2MB = 1/MB2AU
