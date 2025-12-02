@@ -29,3 +29,13 @@ def load_PI_xs(xs_file):
     xs_dict = dict(zip(xs_energies,xs), dtype= float)
     
     return xs_dict
+
+def load_rec_tau(rec_tau_file):
+    """ 
+    reads in the inverse of the radiative lifetimes (rec_tau) in s from the corresponding file,
+    where each row is the same orbital on monomer 1 and each column the same orbital on monomer 2,
+    and places these into an array
+    """
+    rec_tau_data = np.loadtxt(rec_tau_file)
+
+    return rec_tau_data
