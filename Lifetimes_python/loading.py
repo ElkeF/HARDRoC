@@ -16,3 +16,16 @@ def get_SIP(SIP_file):
 
     return SIP_energies
 
+def load_PI_xs(xs_file):
+    """
+    Reads in the energies in eV and photoionization cross-section in Mb from a file
+    and places these into a dictionary
+    """
+    xs_data = np.loadtxt(xs_file)
+
+    xs_energies = xs_data[:,0] #in eV
+    xs = xs_data[:,1] #in Mb
+
+    xs_dict = dict(zip(xs_energies,xs), dtype= float)
+    
+    return xs_dict
